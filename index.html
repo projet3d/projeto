@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Almoxarifado - Uniformes e EPIs</title>
+    <title>Gestão de Estoque Engesp - Almoxarifado</title>
     <style>
         :root {
             --primary: #1e293b;
+            --engesp-dark: #004d40; /* Verde escuro da logo */
+            --engesp-light: #7a8b2b; /* Verde oliva das curvas */
             --accent-civil: #2563eb;
             --accent-antichama: #dc2626;
             --accent-calcado: #d97706;
             --success: #16a34a;
             --warning: #d97706;
-            --bg-body: #f8fafc;
+            --bg-body: #f1f5f9;
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
             --text-main: #0f172a;
@@ -29,8 +31,88 @@
         body {
             background-color: var(--bg-body);
             color: var(--text-main);
-            padding: 20px;
             line-height: 1.5;
+        }
+
+        /* =========================================
+           LOGO ENGESP EM CÓDIGO (CSS/SVG)
+        ========================================= */
+        .engesp-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        
+        .engesp-logo svg {
+            margin-bottom: -18px; /* Puxa o texto para perto das curvas */
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .engesp-text {
+            font-family: 'Arial Black', Impact, sans-serif;
+            font-size: 58px;
+            color: var(--engesp-dark);
+            line-height: 1;
+            letter-spacing: -2px;
+            text-transform: lowercase;
+            margin-bottom: 2px;
+        }
+
+        .engesp-sub {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 14px;
+            color: var(--engesp-light);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* =========================================
+           TELA DE LOGIN
+        ========================================= */
+        #login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 420px;
+            border-top: 6px solid var(--engesp-dark);
+        }
+
+        .login-card .engesp-logo {
+            margin-bottom: 40px;
+        }
+
+        .login-error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        /* =========================================
+           SISTEMA PRINCIPAL (OCULTO POR PADRÃO)
+        ========================================= */
+        #app-screen {
+            display: none;
+            padding: 20px;
         }
 
         .container {
@@ -44,34 +126,23 @@
         }
 
         header {
-            background-color: var(--primary);
-            color: white;
-            padding: 24px 20px;
+            background-color: white;
+            padding: 30px 20px;
             text-align: center;
-        }
-
-        header h1 {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        header p {
-            color: #94a3b8;
-            font-size: 14px;
-            margin-top: 4px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         /* NAVEGAÇÃO POR ABAS */
         .nav-tabs {
             display: flex;
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             border-bottom: 1px solid var(--border-color);
             overflow-x: auto;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 14px 16px;
+            padding: 16px;
             border: none;
             background: none;
             font-size: 15px;
@@ -84,13 +155,13 @@
         }
 
         .tab-btn:hover {
-            color: var(--primary);
+            color: var(--engesp-dark);
             background-color: #e2e8f0;
         }
 
         .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+            color: var(--engesp-dark);
+            border-bottom-color: var(--engesp-dark);
             background-color: white;
         }
 
@@ -131,7 +202,7 @@
         }
 
         .contador-total {
-            background-color: var(--primary);
+            background-color: var(--engesp-dark);
             color: white;
             padding: 10px 16px;
             border-radius: 6px;
@@ -159,9 +230,9 @@
         }
 
         .filter-btn.active {
-            background: var(--primary);
+            background: var(--engesp-dark);
             color: white;
-            border-color: var(--primary);
+            border-color: var(--engesp-dark);
         }
 
         /* GRID DE CARDS */
@@ -181,13 +252,8 @@
             position: relative;
         }
 
-        .card.antichama {
-            border-top-color: var(--accent-antichama);
-        }
-
-        .card.calcado {
-            border-top-color: var(--accent-calcado);
-        }
+        .card.antichama { border-top-color: var(--accent-antichama); }
+        .card.calcado { border-top-color: var(--accent-calcado); }
 
         .card-tag {
             font-size: 11px;
@@ -199,39 +265,13 @@
             margin-bottom: 8px;
         }
 
-        .card.civil .card-tag {
-            background-color: #dbeafe;
-            color: var(--accent-civil);
-        }
+        .card.civil .card-tag { background-color: #dbeafe; color: var(--accent-civil); }
+        .card.antichama .card-tag { background-color: #fee2e2; color: var(--accent-antichama); }
+        .card.calcado .card-tag { background-color: #fef3c7; color: var(--accent-calcado); }
 
-        .card.antichama .card-tag {
-            background-color: #fee2e2;
-            color: var(--accent-antichama);
-        }
-
-        .card.calcado .card-tag {
-            background-color: #fef3c7;
-            color: var(--accent-calcado);
-        }
-
-        .card h3 {
-            font-size: 15px;
-            color: var(--text-main);
-            margin-bottom: 10px;
-        }
-
-        .card .qtd {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .card .alerta-baixo {
-            margin-top: 8px;
-            font-size: 12px;
-            color: var(--warning);
-            font-weight: 700;
-        }
+        .card h3 { font-size: 15px; color: var(--text-main); margin-bottom: 10px; }
+        .card .qtd { font-size: 26px; font-weight: 800; color: var(--engesp-dark); }
+        .card .alerta-baixo { margin-top: 8px; font-size: 12px; color: var(--warning); font-weight: 700; }
 
         /* FORMULÁRIOS */
         .form-card {
@@ -246,12 +286,6 @@
         .form-card.entrada-card { border-top: 4px solid var(--success); }
         .form-card.saida-card { border-top: 4px solid var(--accent-antichama); }
 
-        .form-card h2 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: var(--primary);
-        }
-
         .form-group { margin-bottom: 16px; }
 
         label {
@@ -264,16 +298,22 @@
 
         input, select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
             font-size: 15px;
             background-color: white;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--engesp-dark);
+            box-shadow: 0 0 0 2px rgba(0, 77, 64, 0.1);
         }
 
         .btn-submit {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: none;
             border-radius: 6px;
             font-size: 16px;
@@ -281,13 +321,15 @@
             color: white;
             cursor: pointer;
             margin-top: 10px;
+            transition: opacity 0.2s;
         }
 
+        .btn-submit:hover { opacity: 0.9; }
+        
+        /* Cores dos botões */
+        .btn-login { background-color: var(--engesp-dark); }
         .btn-entrada { background-color: var(--success); }
-        .btn-entrada:hover { background-color: #15803d; }
-
         .btn-saida { background-color: var(--accent-antichama); }
-        .btn-saida:hover { background-color: #b91c1c; }
 
         /* TABELA DE HISTÓRICO */
         .table-responsive {
@@ -297,35 +339,11 @@
             border-radius: 8px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 14px;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { background-color: #f1f5f9; color: var(--text-muted); font-weight: 700; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
 
-        th {
-            background-color: #f1f5f9;
-            color: var(--text-muted);
-            font-weight: 700;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 700; }
         .badge-entrada { background-color: #dcfce7; color: #15803d; }
         .badge-saida { background-color: #fee2e2; color: #b91c1c; }
 
@@ -340,143 +358,277 @@
             font-weight: 600;
             margin-top: 20px;
         }
+        
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            background: #e2e8f0;
+        }
+        
+        .btn-logout {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-logout:hover { color: var(--accent-antichama); }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>📦 Almoxarifado - Uniformes e EPIs</h1>
-        <p>Gestão de camisas, calças e botinas de segurança</p>
-    </header>
-
-    <!-- NAVEGAÇÃO POR ABAS -->
-    <nav class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('estoque')">📊 Estoque Atual</button>
-        <button class="tab-btn" onclick="switchTab('entrada')">📥 Registrar Entrada</button>
-        <button class="tab-btn" onclick="switchTab('saida')">📤 Registrar Saída</button>
-        <button class="tab-btn" onclick="switchTab('historico')">📑 Histórico</button>
-    </nav>
-
-    <!-- ABA 1: ESTOQUE ATUAL -->
-    <div id="tab-estoque" class="tab-content active">
+<!-- ================= TELA DE LOGIN ================= -->
+<div id="login-screen">
+    <div class="login-card">
         
-        <div class="estoque-controles">
-            <div class="busca-container">
-                <input type="text" id="campo-busca" placeholder="🔍 Buscar por número (ex: 41), tamanho (ex: GG), peça..." onkeyup="renderEstoque()">
-            </div>
-            <div class="contador-total" id="contador-pecas">
-                Total: 0 peças
-            </div>
-            
-            <div class="filter-container">
-                <button class="filter-btn active" onclick="filtrarEstoque('todos', this)">Todos</button>
-                <button class="filter-btn" onclick="filtrarEstoque('camisa', this)">👔 Camisas</button>
-                <button class="filter-btn" onclick="filtrarEstoque('calca', this)">👖 Calças</button>
-                <button class="filter-btn" onclick="filtrarEstoque('botina', this)">🥾 Botinas</button>
-                <button class="filter-btn" onclick="filtrarEstoque('civil', this)">Civil</button>
-                <button class="filter-btn" onclick="filtrarEstoque('antichama', this)">Antichama</button>
-            </div>
+        <!-- LOGO DESENHADA EM CÓDIGO (CSS) -->
+        <div class="engesp-logo">
+            <svg viewBox="0 0 300 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 42 Q 150 12 290 8" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path d="M20 47 Q 160 17 280 13" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path d="M30 52 Q 170 22 270 18" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            </svg>
+            <div class="engesp-text">engesp</div>
+            <div class="engesp-sub">Gestão de Estoque</div>
         </div>
 
-        <div class="estoque-grid" id="grid-estoque"></div>
+        <div id="login-error" class="login-error">
+            ⚠️ Usuário ou senha incorretos.
+        </div>
+
+        <form id="form-login">
+            <div class="form-group">
+                <label for="login-user">Usuário</label>
+                <input type="text" id="login-user" required placeholder="Digite seu usuário">
+            </div>
+            <div class="form-group">
+                <label for="login-pass">Senha</label>
+                <input type="password" id="login-pass" required placeholder="Digite sua senha">
+            </div>
+            <button type="submit" class="btn-submit btn-login">Acessar Sistema</button>
+        </form>
+    </div>
+</div>
+
+<!-- ================= SISTEMA PRINCIPAL ================= -->
+<div id="app-screen">
+    
+    <div class="header-actions">
+        <span id="user-display" style="margin-right: 15px; font-size: 14px; font-weight: 600; color: #64748b;"></span>
+        <button class="btn-logout" onclick="fazerLogout()">🚪 Sair</button>
     </div>
 
-    <!-- ABA 2: REGISTRAR ENTRADA -->
-    <div id="tab-entrada" class="tab-content">
-        <div class="form-card entrada-card">
-            <h2>📥 Registrar Entrada de Peças</h2>
-            <form id="form-entrada">
-                <div class="form-group">
-                    <label for="ent-responsavel">Responsável / Origem / Nº Nota Fiscal:</label>
-                    <input type="text" id="ent-responsavel" required placeholder="Ex: Fornecedor / NF 1042">
+    <div class="container">
+        <header>
+            <!-- A MESMA LOGO NO CABEÇALHO DO SISTEMA -->
+            <div class="engesp-logo" style="margin: 0 auto 10px auto;">
+                <svg viewBox="0 0 300 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 42 Q 150 12 290 8" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path d="M20 47 Q 160 17 280 13" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path d="M30 52 Q 170 22 270 18" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                </svg>
+                <div class="engesp-text">engesp</div>
+                <div class="engesp-sub">Gestão de Estoque</div>
+            </div>
+            <p style="color: #64748b; font-size: 14px; margin-top: 15px;">Almoxarifado: Controle de Uniformes e EPIs</p>
+        </header>
+
+        <!-- NAVEGAÇÃO POR ABAS -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('estoque')">📊 Estoque Atual</button>
+            <button class="tab-btn" onclick="switchTab('entrada')">📥 Registrar Entrada</button>
+            <button class="tab-btn" onclick="switchTab('saida')">📤 Registrar Saída</button>
+            <button class="tab-btn" onclick="switchTab('historico')">📑 Histórico</button>
+        </nav>
+
+        <!-- ABA 1: ESTOQUE ATUAL -->
+        <div id="tab-estoque" class="tab-content active">
+            <div class="estoque-controles">
+                <div class="busca-container">
+                    <input type="text" id="campo-busca" placeholder="🔍 Buscar por número (ex: 41), tamanho (ex: GG), peça..." onkeyup="renderEstoque()">
                 </div>
-
-                <div class="form-group">
-                    <label for="ent-item">Selecione o Item:</label>
-                    <select id="ent-item" required class="select-uniformes"></select>
+                <div class="contador-total" id="contador-pecas">
+                    Total: 0 peças
                 </div>
-
-                <div class="form-group">
-                    <label for="ent-qtd">Quantidade Chegando / Inicial:</label>
-                    <input type="number" id="ent-qtd" required min="1" value="1">
+                
+                <div class="filter-container">
+                    <button class="filter-btn active" onclick="filtrarEstoque('todos', this)">Todos</button>
+                    <button class="filter-btn" onclick="filtrarEstoque('camisa', this)">👔 Camisas</button>
+                    <button class="filter-btn" onclick="filtrarEstoque('calca', this)">👖 Calças</button>
+                    <button class="filter-btn" onclick="filtrarEstoque('botina', this)">🥾 Botinas</button>
+                    <button class="filter-btn" onclick="filtrarEstoque('civil', this)">Civil</button>
+                    <button class="filter-btn" onclick="filtrarEstoque('antichama', this)">Antichama</button>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="ent-obs">Observação (Opcional):</label>
-                    <input type="text" id="ent-obs" placeholder="Ex: Inventário Inicial">
-                </div>
-
-                <button type="submit" class="btn-submit btn-entrada">➕ Adicionar ao Estoque</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ABA 3: REGISTRAR SAÍDA -->
-    <div id="tab-saida" class="tab-content">
-        <div class="form-card saida-card">
-            <h2>📤 Registrar Retirada de Peça</h2>
-            <form id="form-saida">
-                <div class="form-group">
-                    <label for="sai-funcionario">Nome do Funcionário:</label>
-                    <input type="text" id="sai-funcionario" required placeholder="Ex: Carlos Eduardo">
-                </div>
-
-                <div class="form-group">
-                    <label for="sai-item">Selecione o Item:</label>
-                    <select id="sai-item" required class="select-uniformes"></select>
-                </div>
-
-                <div class="form-group">
-                    <label for="sai-qtd">Quantidade Retirada:</label>
-                    <input type="number" id="sai-qtd" required min="1" value="1">
-                </div>
-
-                <div class="form-group">
-                    <label for="sai-obs">Observação / Motivo (Opcional):</label>
-                    <input type="text" id="sai-obs" placeholder="Ex: Troca por desgaste">
-                </div>
-
-                <button type="submit" class="btn-submit btn-saida">➖ Confirmar Saída</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ABA 4: HISTÓRICO -->
-    <div id="tab-historico" class="tab-content">
-        <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-            <h2>Histórico Completo</h2>
-            <select id="filtro-historico" onchange="renderHistorico()" style="width: auto; padding: 6px 12px;">
-                <option value="todos">Todas as Movimentações</option>
-                <option value="ENTRADA">Apenas Entradas</option>
-                <option value="SAIDA">Apenas Saídas</option>
-            </select>
+            <div class="estoque-grid" id="grid-estoque"></div>
         </div>
 
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Tipo</th>
-                        <th>Item</th>
-                        <th>Qtd</th>
-                        <th>Pessoa / Resp.</th>
-                        <th>Saldo Restante</th>
-                        <th>Obs</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-historico"></tbody>
-            </table>
+        <!-- ABA 2: REGISTRAR ENTRADA -->
+        <div id="tab-entrada" class="tab-content">
+            <div class="form-card entrada-card">
+                <h2 style="color: var(--success); margin-bottom: 20px;">📥 Registrar Entrada de Peças</h2>
+                <form id="form-entrada">
+                    <div class="form-group">
+                        <label for="ent-responsavel">Responsável / Origem / Nº Nota Fiscal:</label>
+                        <input type="text" id="ent-responsavel" required placeholder="Ex: Fornecedor / NF 1042">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ent-item">Selecione o Item:</label>
+                        <select id="ent-item" required class="select-uniformes"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ent-qtd">Quantidade Chegando / Inicial:</label>
+                        <input type="number" id="ent-qtd" required min="1" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ent-obs">Observação (Opcional):</label>
+                        <input type="text" id="ent-obs" placeholder="Ex: Inventário Inicial">
+                    </div>
+
+                    <button type="submit" class="btn-submit btn-entrada">➕ Adicionar ao Estoque</button>
+                </form>
+            </div>
         </div>
 
-        <div style="text-align: center;">
-            <button class="btn-reset" onclick="resetarSistema()">⚠️ Resetar Todo o Sistema</button>
+        <!-- ABA 3: REGISTRAR SAÍDA -->
+        <div id="tab-saida" class="tab-content">
+            <div class="form-card saida-card">
+                <h2 style="color: var(--accent-antichama); margin-bottom: 20px;">📤 Registrar Retirada de Peça</h2>
+                <form id="form-saida">
+                    <div class="form-group">
+                        <label for="sai-funcionario">Nome do Funcionário:</label>
+                        <input type="text" id="sai-funcionario" required placeholder="Ex: Carlos Eduardo">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sai-item">Selecione o Item:</label>
+                        <select id="sai-item" required class="select-uniformes"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sai-qtd">Quantidade Retirada:</label>
+                        <input type="number" id="sai-qtd" required min="1" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sai-obs">Observação / Motivo (Opcional):</label>
+                        <input type="text" id="sai-obs" placeholder="Ex: Troca por desgaste">
+                    </div>
+
+                    <button type="submit" class="btn-submit btn-saida">➖ Confirmar Saída</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ABA 4: HISTÓRICO -->
+        <div id="tab-historico" class="tab-content">
+            <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="color: var(--engesp-dark);">Histórico Completo</h2>
+                <select id="filtro-historico" onchange="renderHistorico()" style="width: auto; padding: 6px 12px;">
+                    <option value="todos">Todas as Movimentações</option>
+                    <option value="ENTRADA">Apenas Entradas</option>
+                    <option value="SAIDA">Apenas Saídas</option>
+                </select>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Tipo</th>
+                            <th>Item</th>
+                            <th>Qtd</th>
+                            <th>Pessoa / Resp.</th>
+                            <th>Saldo Restante</th>
+                            <th>Obs</th>
+                            <th>Usuário Sis.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-historico"></tbody>
+                </table>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn-reset" onclick="resetarSistema()">⚠️ Resetar Todo o Sistema</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    // ==========================================
+    // LÓGICA DE LOGIN E AUTENTICAÇÃO
+    // ==========================================
+    const formLogin = document.getElementById('form-login');
+    const loginScreen = document.getElementById('login-screen');
+    const appScreen = document.getElementById('app-screen');
+    const loginError = document.getElementById('login-error');
+    const userDisplay = document.getElementById('user-display');
+
+    // Verifica se já fez login na sessão atual (evita logar de novo ao dar F5)
+    let usuarioLogado = sessionStorage.getItem('engesp_usuario_logado');
+    if (usuarioLogado) {
+        liberarAcesso(usuarioLogado);
+    }
+
+    formLogin.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Pega o usuário digitado e converte para minúsculo para aceitar (Larissa ou larissa)
+        const user = document.getElementById('login-user').value.trim().toLowerCase();
+        const pass = document.getElementById('login-pass').value;
+
+        // Validação de Credenciais solicitadas
+        if (user === 'larissa' && pass === 'lari123') {
+            iniciarSessao('Larissa');
+        } 
+        else if (user === 'kaka' && pass === '789456') {
+            iniciarSessao('Kaka');
+        } 
+        else {
+            // Falha no login
+            loginError.style.display = 'block';
+            document.getElementById('login-pass').value = ''; // Limpa a senha
+        }
+    });
+
+    function iniciarSessao(nomeUser) {
+        sessionStorage.setItem('engesp_usuario_logado', nomeUser);
+        usuarioLogado = nomeUser;
+        liberarAcesso(nomeUser);
+    }
+
+    function liberarAcesso(nomeUser) {
+        loginScreen.style.display = 'none';
+        appScreen.style.display = 'block';
+        userDisplay.innerText = `Olá, ${nomeUser}`;
+        
+        // Inicia o render do sistema após logar
+        popularSelects();
+        renderEstoque();
+    }
+
+    function fazerLogout() {
+        sessionStorage.removeItem('engesp_usuario_logado');
+        usuarioLogado = null;
+        appScreen.style.display = 'none';
+        loginScreen.style.display = 'flex';
+        formLogin.reset();
+        loginError.style.display = 'none';
+    }
+
+
+    // ==========================================
+    // LÓGICA DO ALMOXARIFADO (ESTOQUE)
+    // ==========================================
     const estoquePadrao = {
         // CIVIL - CAMISAS
         civil_camisa_p:    { nome: 'Camisa Civil - P',    tipo: 'civil', peca: 'camisa', qtd: 0 },
@@ -510,7 +662,7 @@
         antichama_calca_exg:  { nome: 'Calça Antichama - EXG',  tipo: 'antichama', peca: 'calca', qtd: 0 },
         antichama_calca_exgg: { nome: 'Calça Antichama - EXGG', tipo: 'antichama', peca: 'calca', qtd: 0 },
 
-        // BOTINAS / CALÇADOS (Numeração do 35 ao 45)
+        // BOTINAS / CALÇADOS
         botina_35: { nome: 'Botina - 35', tipo: 'calcado', peca: 'botina', qtd: 0 },
         botina_36: { nome: 'Botina - 36', tipo: 'calcado', peca: 'botina', qtd: 0 },
         botina_37: { nome: 'Botina - 37', tipo: 'calcado', peca: 'botina', qtd: 0 },
@@ -596,18 +748,14 @@
         for (let key in estoque) {
             const item = estoque[key];
 
-            // Filtro por categoria (Botões)
             if (filtroEstoqueAtual === 'camisa' && item.peca !== 'camisa') continue;
             if (filtroEstoqueAtual === 'calca' && item.peca !== 'calca') continue;
             if (filtroEstoqueAtual === 'botina' && item.peca !== 'botina') continue;
             if (filtroEstoqueAtual === 'civil' && item.tipo !== 'civil') continue;
             if (filtroEstoqueAtual === 'antichama' && item.tipo !== 'antichama') continue;
 
-            // Filtro por texto (Barra de Busca)
             if (termoBusca !== '') {
-                if (!item.nome.toLowerCase().includes(termoBusca)) {
-                    continue;
-                }
+                if (!item.nome.toLowerCase().includes(termoBusca)) continue;
             }
 
             totalPecas += item.qtd;
@@ -645,6 +793,8 @@
         const obs = document.getElementById('ent-obs').value || '-';
 
         estoque[itemKey].qtd += qtd;
+        
+        // Adiciona ao histórico registrando quem fez a ação no sistema
         historico.push({
             data: new Date().toLocaleString('pt-BR'),
             tipo: 'ENTRADA',
@@ -652,7 +802,8 @@
             qtd: qtd,
             pessoa: responsavel,
             saldo: estoque[itemKey].qtd,
-            obs: obs
+            obs: obs,
+            usuarioSistema: usuarioLogado 
         });
 
         salvar();
@@ -675,6 +826,8 @@
         }
 
         estoque[itemKey].qtd -= qtd;
+        
+        // Adiciona ao histórico registrando quem fez a ação no sistema
         historico.push({
             data: new Date().toLocaleString('pt-BR'),
             tipo: 'SAIDA',
@@ -682,7 +835,8 @@
             qtd: qtd,
             pessoa: funcionario,
             saldo: estoque[itemKey].qtd,
-            obs: obs
+            obs: obs,
+            usuarioSistema: usuarioLogado
         });
 
         salvar();
@@ -704,6 +858,7 @@
             const isEntrada = reg.tipo === 'ENTRADA';
             const badgeClass = isEntrada ? 'badge-entrada' : 'badge-saida';
             const sinal = isEntrada ? '+' : '-';
+            const userSys = reg.usuarioSistema || 'Desconhecido';
 
             tr.innerHTML = `
                 <td>${reg.data}</td>
@@ -713,6 +868,7 @@
                 <td>${reg.pessoa}</td>
                 <td><strong>${reg.saldo} un.</strong></td>
                 <td style="color:#64748b; font-size:13px;">${reg.obs}</td>
+                <td style="font-size:12px; font-weight:bold; color:var(--engesp-dark)">${userSys}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -725,9 +881,6 @@
             location.reload();
         }
     }
-
-    popularSelects();
-    renderEstoque();
 </script>
 </body>
 </html>
