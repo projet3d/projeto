@@ -3,170 +3,641 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Koda Studio Artes - Leitor de Projetos 3D</title>
+    <title>Controle de Almoxarifado - Uniformes</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        :root {
+            --primary: #1e293b;
+            --accent-civil: #2563eb;
+            --accent-antichama: #dc2626;
+            --success: #16a34a;
+            --warning: #d97706;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
         }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
         .container {
-            background-color: #1e1e1e;
-            padding: 30px;
+            max-width: 1050px;
+            margin: 0 auto;
+            background: var(--card-bg);
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            max-width: 600px;
-            width: 100%;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 24px 20px;
             text-align: center;
         }
-        h1 {
-            color: #00d2ff;
-            margin-bottom: 5px;
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
         }
-        p.subtitle {
-            color: #aaaaaa;
-            margin-bottom: 30px;
+
+        header p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 4px;
         }
-        .upload-area {
-            border: 2px dashed #00d2ff;
-            padding: 40px;
-            border-radius: 8px;
+
+        /* NAVEGAÇÃO POR ABAS */
+        .nav-tabs {
+            display: flex;
+            background-color: #f1f5f9;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px 16px;
+            border: none;
+            background: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-muted);
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background-color: #e2e8f0;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background-color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 24px;
+        }
+
+        .tab-content.active {
             display: block;
         }
-        .upload-area:hover {
-            background-color: #2a2a2a;
+
+        /* FILTROS DE ESTOQUE */
+        .filter-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        input[type="file"] {
-            display: none;
-        }
-        button {
-            background-color: #00d2ff;
-            color: #121212;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            margin-top: 20px;
+
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: #f1f5f9;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* GRID DE CARDS */
+        .estoque-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--accent-civil);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .card.antichama {
+            border-top-color: var(--accent-antichama);
+        }
+
+        .card-tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .card.civil .card-tag {
+            background-color: #dbeafe;
+            color: var(--accent-civil);
+        }
+
+        .card.antichama .card-tag {
+            background-color: #fee2e2;
+            color: var(--accent-antichama);
+        }
+
+        .card h3 {
+            font-size: 15px;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .card .qtd {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .card .alerta-baixo {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--warning);
+            font-weight: 700;
+        }
+
+        /* FORMULÁRIOS */
+        .form-card {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 8px;
+        }
+
+        .form-card.entrada-card { border-top: 4px solid var(--success); }
+        .form-card.saida-card { border-top: 4px solid var(--accent-antichama); }
+
+        .form-card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        input, select {
             width: 100%;
-        }
-        button:hover {
-            background-color: #009acc;
-        }
-        #resultado {
-            margin-top: 30px;
-            text-align: left;
-            background-color: #2a2a2a;
-            padding: 15px;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
-            display: none;
+            font-size: 15px;
+            background-color: white;
         }
-        .loader {
-            display: none;
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-entrada { background-color: var(--success); }
+        .btn-entrada:hover { background-color: #15803d; }
+
+        .btn-saida { background-color: var(--accent-antichama); }
+        .btn-saida:hover { background-color: #b91c1c; }
+
+        /* TABELA DE HISTÓRICO */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-entrada { background-color: #dcfce7; color: #15803d; }
+        .badge-saida { background-color: #fee2e2; color: #b91c1c; }
+
+        .btn-reset {
+            background: none;
+            border: 1px solid #fca5a5;
+            color: #dc2626;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
             margin-top: 20px;
-            color: #00d2ff;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Koda Studio Artes</h1>
-        <p class="subtitle">Conversor de Rascunho para Projeto</p>
+<div class="container">
+    <header>
+        <h1>📦 Almoxarifado - Controle de Uniformes</h1>
+        <p>Gestão de camisas e calças civis e antichama</p>
+    </header>
 
-        <label class="upload-area" id="drop-area">
-            <span id="file-name">Clique para enviar o rascunho (Papel/Caneta)</span>
-            <input type="file" id="imageInput" accept="image/*">
-        </label>
+    <!-- NAVEGAÇÃO POR ABAS -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('estoque')">📊 Estoque Atual</button>
+        <button class="tab-btn" onclick="switchTab('entrada')">📥 Registrar Entrada</button>
+        <button class="tab-btn" onclick="switchTab('saida')">📤 Registrar Saída</button>
+        <button class="tab-btn" onclick="switchTab('historico')">📑 Histórico</button>
+    </nav>
 
-        <button onclick="processarImagem()">Gerar Medidas e Projeto</button>
+    <!-- ABA 1: ESTOQUE ATUAL -->
+    <div id="tab-estoque" class="tab-content active">
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="filtrarEstoque('todos', this)">Todos</button>
+            <button class="filter-btn" onclick="filtrarEstoque('camisa', this)">👔 Apenas Camisas</button>
+            <button class="filter-btn" onclick="filtrarEstoque('calca', this)">👖 Apenas Calças</button>
+            <button class="filter-btn" onclick="filtrarEstoque('civil', this)">Civil</button>
+            <button class="filter-btn" onclick="filtrarEstoque('antichama', this)">Antichama</button>
+        </div>
 
-        <div class="loader" id="loader">Lendo o rascunho com IA... A mágica está acontecendo...</div>
+        <div class="estoque-grid" id="grid-estoque"></div>
+    </div>
 
-        <div id="resultado">
-            <h3 style="color: #00d2ff;">Leitura do Projeto:</h3>
-            <pre id="texto-extraido" style="white-space: pre-wrap; font-family: inherit;"></pre>
+    <!-- ABA 2: REGISTRAR ENTRADA -->
+    <div id="tab-entrada" class="tab-content">
+        <div class="form-card entrada-card">
+            <h2>📥 Registrar Entrada de Peças</h2>
+            <form id="form-entrada">
+                <div class="form-group">
+                    <label for="ent-responsavel">Responsável / Origem / Nº Nota Fiscal:</label>
+                    <input type="text" id="ent-responsavel" required placeholder="Ex: Fornecedor / NF 1042">
+                </div>
+
+                <div class="form-group">
+                    <label for="ent-item">Selecione a Peça:</label>
+                    <select id="ent-item" required class="select-uniformes"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ent-qtd">Quantidade Chegando / Inicial:</label>
+                    <input type="number" id="ent-qtd" required min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="ent-obs">Observação (Opcional):</label>
+                    <input type="text" id="ent-obs" placeholder="Ex: Inventário Inicial">
+                </div>
+
+                <button type="submit" class="btn-submit btn-entrada">➕ Adicionar ao Estoque</button>
+            </form>
         </div>
     </div>
 
-    <script>
-        // Insira a sua chave de API real aqui, mantendo-a entre as aspas
-        const API_KEY = "AQ.Ab8RN6KG9Zw970Nd3RIicnlEmMduiJ1Jmq2jTu-bCSaftAjWDA"; 
+    <!-- ABA 3: REGISTRAR SAÍDA -->
+    <div id="tab-saida" class="tab-content">
+        <div class="form-card saida-card">
+            <h2>📤 Registrar Retirada de Peça</h2>
+            <form id="form-saida">
+                <div class="form-group">
+                    <label for="sai-funcionario">Nome do Funcionário:</label>
+                    <input type="text" id="sai-funcionario" required placeholder="Ex: Carlos Eduardo">
+                </div>
 
-        const imageInput = document.getElementById('imageInput');
-        const fileNameDisplay = document.getElementById('file-name');
+                <div class="form-group">
+                    <label for="sai-item">Selecione a Peça:</label>
+                    <select id="sai-item" required class="select-uniformes"></select>
+                </div>
 
-        imageInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                fileNameDisplay.textContent = "Arquivo selecionado: " + this.files[0].name;
+                <div class="form-group">
+                    <label for="sai-qtd">Quantidade Retirada:</label>
+                    <input type="number" id="sai-qtd" required min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="sai-obs">Observação / Motivo (Opcional):</label>
+                    <input type="text" id="sai-obs" placeholder="Ex: Rasgou a calça no trabalho">
+                </div>
+
+                <button type="submit" class="btn-submit btn-saida">➖ Confirmar Saída</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ABA 4: HISTÓRICO -->
+    <div id="tab-historico" class="tab-content">
+        <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <h2>Histórico Completo</h2>
+            <select id="filtro-historico" onchange="renderHistorico()" style="width: auto; padding: 6px 12px;">
+                <option value="todos">Todas as Movimentações</option>
+                <option value="ENTRADA">Apenas Entradas</option>
+                <option value="SAIDA">Apenas Saídas</option>
+            </select>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Tipo</th>
+                        <th>Item</th>
+                        <th>Qtd</th>
+                        <th>Pessoa / Resp.</th>
+                        <th>Saldo Restante</th>
+                        <th>Obs</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-historico"></tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="btn-reset" onclick="resetarSistema()">⚠️ Resetar Todo o Sistema</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Estoque inicial totalmente zerado para inventário
+    const estoquePadrao = {
+        // CIVIL - CAMISAS
+        civil_camisa_p:    { nome: 'Camisa Civil - P',    tipo: 'civil', peca: 'camisa', qtd: 0 },
+        civil_camisa_m:    { nome: 'Camisa Civil - M',    tipo: 'civil', peca: 'camisa', qtd: 0 },
+        civil_camisa_g:    { nome: 'Camisa Civil - G',    tipo: 'civil', peca: 'camisa', qtd: 0 },
+        civil_camisa_gg:   { nome: 'Camisa Civil - GG',   tipo: 'civil', peca: 'camisa', qtd: 0 },
+        civil_camisa_exg:  { nome: 'Camisa Civil - EXG',  tipo: 'civil', peca: 'camisa', qtd: 0 },
+        civil_camisa_exgg: { nome: 'Camisa Civil - EXGG', tipo: 'civil', peca: 'camisa', qtd: 0 },
+
+        // CIVIL - CALÇAS
+        civil_calca_p:    { nome: 'Calça Civil - P',    tipo: 'civil', peca: 'calca', qtd: 0 },
+        civil_calca_m:    { nome: 'Calça Civil - M',    tipo: 'civil', peca: 'calca', qtd: 0 },
+        civil_calca_g:    { nome: 'Calça Civil - G',    tipo: 'civil', peca: 'calca', qtd: 0 },
+        civil_calca_gg:   { nome: 'Calça Civil - GG',   tipo: 'civil', peca: 'calca', qtd: 0 },
+        civil_calca_exg:  { nome: 'Calça Civil - EXG',  tipo: 'civil', peca: 'calca', qtd: 0 },
+        civil_calca_exgg: { nome: 'Calça Civil - EXGG', tipo: 'civil', peca: 'calca', qtd: 0 },
+
+        // ANTICHAMA - CAMISAS
+        antichama_camisa_p:    { nome: 'Camisa Antichama - P',    tipo: 'antichama', peca: 'camisa', qtd: 0 },
+        antichama_camisa_m:    { nome: 'Camisa Antichama - M',    tipo: 'antichama', peca: 'camisa', qtd: 0 },
+        antichama_camisa_g:    { nome: 'Camisa Antichama - G',    tipo: 'antichama', peca: 'camisa', qtd: 0 },
+        antichama_camisa_gg:   { nome: 'Camisa Antichama - GG',   tipo: 'antichama', peca: 'camisa', qtd: 0 },
+        antichama_camisa_exg:  { nome: 'Camisa Antichama - EXG',  tipo: 'antichama', peca: 'camisa', qtd: 0 },
+        antichama_camisa_exgg: { nome: 'Camisa Antichama - EXGG', tipo: 'antichama', peca: 'camisa', qtd: 0 },
+
+        // ANTICHAMA - CALÇAS
+        antichama_calca_p:    { nome: 'Calça Antichama - P',    tipo: 'antichama', peca: 'calca', qtd: 0 },
+        antichama_calca_m:    { nome: 'Calça Antichama - M',    tipo: 'antichama', peca: 'calca', qtd: 0 },
+        antichama_calca_g:    { nome: 'Calça Antichama - G',    tipo: 'antichama', peca: 'calca', qtd: 0 },
+        antichama_calca_gg:   { nome: 'Calça Antichama - GG',   tipo: 'antichama', peca: 'calca', qtd: 0 },
+        antichama_calca_exg:  { nome: 'Calça Antichama - EXG',  tipo: 'antichama', peca: 'calca', qtd: 0 },
+        antichama_calca_exgg: { nome: 'Calça Antichama - EXGG', tipo: 'antichama', peca: 'calca', qtd: 0 }
+    };
+
+    // Note o v4 aqui para forçar um "novo" armazenamento se desejar, mas mantive v3 para você limpar no botão
+    let estoque = JSON.parse(localStorage.getItem('almox_estoque_v3')) || estoquePadrao;
+    let historico = JSON.parse(localStorage.getItem('almox_historico_v3')) || [];
+    let filtroEstoqueAtual = 'todos';
+
+    function salvar() {
+        localStorage.setItem('almox_estoque_v3', JSON.stringify(estoque));
+        localStorage.setItem('almox_historico_v3', JSON.stringify(historico));
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+        event.currentTarget.classList.add('active');
+
+        if (tabId === 'estoque') renderEstoque();
+        if (tabId === 'historico') renderHistorico();
+    }
+
+    function popularSelects() {
+        const selects = document.querySelectorAll('.select-uniformes');
+        selects.forEach(select => {
+            select.innerHTML = '<option value="">Selecione a peça...</option>';
+
+            const grupos = {
+                civil_camisa: document.createElement('optgroup'),
+                civil_calca: document.createElement('optgroup'),
+                antichama_camisa: document.createElement('optgroup'),
+                antichama_calca: document.createElement('optgroup')
+            };
+
+            grupos.civil_camisa.label = "👕 Camisas Civis";
+            grupos.civil_calca.label = "👖 Calças Civis";
+            grupos.antichama_camisa.label = "🔥👕 Camisas Antichama";
+            grupos.antichama_calca.label = "🔥👖 Calças Antichama";
+
+            for (let key in estoque) {
+                const item = estoque[key];
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = `${item.nome} (${item.qtd} un. em estoque)`;
+
+                const grupoChave = `${item.tipo}_${item.peca}`;
+                if (grupos[grupoChave]) {
+                    grupos[grupoChave].appendChild(option);
+                }
+            }
+
+            for (let g in grupos) {
+                select.appendChild(grupos[g]);
             }
         });
+    }
 
-        async function processarImagem() {
-            const file = imageInput.files[0];
-            if (!file) {
-                alert('Por favor, envie a foto do rascunho primeiro!');
-                return;
-            }
+    function renderEstoque() {
+        const container = document.getElementById('grid-estoque');
+        container.innerHTML = '';
 
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('resultado').style.display = 'none';
+        for (let key in estoque) {
+            const item = estoque[key];
 
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async function () {
-                const base64Image = reader.result.split(',')[1];
+            // Regra dos Filtros
+            if (filtroEstoqueAtual === 'camisa' && item.peca !== 'camisa') continue;
+            if (filtroEstoqueAtual === 'calca' && item.peca !== 'calca') continue;
+            if (filtroEstoqueAtual === 'civil' && item.tipo !== 'civil') continue;
+            if (filtroEstoqueAtual === 'antichama' && item.tipo !== 'antichama') continue;
 
-                const promptText = "Aja como um arquiteto profissional. Analise este esboço feito à mão. Liste todos os cômodos, portas, janelas e extraia as metragens (medidas) exatas escritas no papel. Organize a resposta de forma limpa e profissional.";
+            const card = document.createElement('div');
+            card.className = `card ${item.tipo}`;
+            const alerta = item.qtd <= 5 ? `<div class="alerta-baixo">⚠️ Baixo estoque!</div>` : '';
 
-                try {
-                    // Construindo a URL com a API Key, que é o padrão da API do Gemini
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [
-                                    { text: promptText },
-                                    { inline_data: { mime_type: file.type, data: base64Image } }
-                                ]
-                            }]
-                        })
-                    });
-
-                    const data = await response.json();
-                    
-                    document.getElementById('loader').style.display = 'none';
-                    document.getElementById('resultado').style.display = 'block';
-                    
-                    if (data.error) {
-                        document.getElementById('texto-extraido').innerText = `Erro do Google: ${data.error.message}`;
-                        return;
-                    }
-                    
-                    const textoResultado = data.candidates[0].content.parts[0].text;
-                    document.getElementById('texto-extraido').innerText = textoResultado;
-
-                } catch (error) {
-                    console.error('Erro:', error);
-                    document.getElementById('loader').style.display = 'none';
-                    alert('Erro de comunicação com o servidor.');
-                }
-            };
+            card.innerHTML = `
+                <span class="card-tag">${item.tipo} - ${item.peca}</span>
+                <h3>${item.nome}</h3>
+                <div class="qtd">${item.qtd} <span style="font-size:14px; font-weight:normal;">un.</span></div>
+                ${alerta}
+            `;
+            container.appendChild(card);
         }
-    </script>
+    }
+
+    function filtrarEstoque(tipo, btn) {
+        filtroEstoqueAtual = tipo;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderEstoque();
+    }
+
+    document.getElementById('form-entrada').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const itemKey = document.getElementById('ent-item').value;
+        const qtd = parseInt(document.getElementById('ent-qtd').value);
+        const responsavel = document.getElementById('ent-responsavel').value;
+        const obs = document.getElementById('ent-obs').value || '-';
+
+        estoque[itemKey].qtd += qtd;
+        historico.push({
+            data: new Date().toLocaleString('pt-BR'),
+            tipo: 'ENTRADA',
+            itemNome: estoque[itemKey].nome,
+            qtd: qtd,
+            pessoa: responsavel,
+            saldo: estoque[itemKey].qtd,
+            obs: obs
+        });
+
+        salvar();
+        popularSelects();
+        alert(`✅ ENTRADA REGISTRADA!\n+${qtd} un. de ${estoque[itemKey].nome}.\nNovo Saldo: ${estoque[itemKey].qtd} unidades.`);
+        this.reset();
+        
+        // Retorna o valor padrão de 1 para evitar entradas acidentais enormes na próxima vez
+        document.getElementById('ent-qtd').value = 1;
+    });
+
+    document.getElementById('form-saida').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const itemKey = document.getElementById('sai-item').value;
+        const qtd = parseInt(document.getElementById('sai-qtd').value);
+        const funcionario = document.getElementById('sai-funcionario').value;
+        const obs = document.getElementById('sai-obs').value || '-';
+
+        if (estoque[itemKey].qtd < qtd) {
+            alert(`❌ ESTOQUE INSUFICIENTE!\nSaldo disponível de ${estoque[itemKey].nome}: ${estoque[itemKey].qtd} un.`);
+            return;
+        }
+
+        estoque[itemKey].qtd -= qtd;
+        historico.push({
+            data: new Date().toLocaleString('pt-BR'),
+            tipo: 'SAIDA',
+            itemNome: estoque[itemKey].nome,
+            qtd: qtd,
+            pessoa: funcionario,
+            saldo: estoque[itemKey].qtd,
+            obs: obs
+        });
+
+        salvar();
+        popularSelects();
+        alert(`✅ SAÍDA REGISTRADA!\nFuncionário: ${funcionario}\nRetirado: ${qtd}x ${estoque[itemKey].nome}\nSaldo Restante: ${estoque[itemKey].qtd} unidades.`);
+        this.reset();
+        document.getElementById('sai-qtd').value = 1;
+    });
+
+    function renderHistorico() {
+        const tbody = document.getElementById('tabela-historico');
+        const filtro = document.getElementById('filtro-historico').value;
+        tbody.innerHTML = '';
+
+        [...historico].reverse().forEach(reg => {
+            if (filtro !== 'todos' && reg.tipo !== filtro) return;
+
+            const tr = document.createElement('tr');
+            const isEntrada = reg.tipo === 'ENTRADA';
+            const badgeClass = isEntrada ? 'badge-entrada' : 'badge-saida';
+            const sinal = isEntrada ? '+' : '-';
+
+            tr.innerHTML = `
+                <td>${reg.data}</td>
+                <td><span class="badge ${badgeClass}">${reg.tipo}</span></td>
+                <td><strong>${reg.itemNome}</strong></td>
+                <td><strong>${sinal}${reg.qtd}</strong></td>
+                <td>${reg.pessoa}</td>
+                <td><strong>${reg.saldo} un.</strong></td>
+                <td style="color:#64748b; font-size:13px;">${reg.obs}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function resetarSistema() {
+        if (confirm("⚠️ Tem certeza que deseja apagar os dados salvos e resetar o sistema para ZERO?")) {
+            localStorage.removeItem('almox_estoque_v3');
+            localStorage.removeItem('almox_historico_v3');
+            location.reload();
+        }
+    }
+
+    popularSelects();
+    renderEstoque();
+</script>
 </body>
 </html>
