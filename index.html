@@ -376,6 +376,25 @@
         }
         .btn-logout:hover { color: var(--accent-antichama); }
 
+        /* =========================================
+           ASSINATURA DO DESENVOLVEDOR (KODA STUDIO)
+        ========================================= */
+        .assinatura-dev {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e1;
+            user-select: none;
+        }
+        
+        .assinatura-dev strong {
+            color: var(--engesp-dark);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
     </style>
 </head>
 <body>
@@ -409,6 +428,12 @@
                 <input type="password" id="login-pass" required placeholder="Digite sua senha">
             </div>
             <button type="submit" class="btn-submit btn-login">Acessar Sistema</button>
+
+            <!-- ASSINATURA NA TELA DE LOGIN -->
+            <div class="assinatura-dev">
+                Desenvolvido por <strong>Koda Studio Artes</strong> 🚀
+            </div>
+            
         </form>
     </div>
 </div>
@@ -560,6 +585,12 @@
                 <button class="btn-reset" onclick="resetarSistema()">⚠️ Resetar Todo o Sistema</button>
             </div>
         </div>
+
+        <!-- ASSINATURA NO RODAPÉ DO SISTEMA -->
+        <div class="assinatura-dev" style="margin: 20px; padding-bottom: 20px; border-top: none;">
+            &copy; 2026 | Sistema criado e desenvolvido por <strong>Koda Studio Artes</strong>
+        </div>
+
     </div>
 </div>
 
