@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ControleÁgil - Voz</title>
+    <title>ControleÁgil - Voz & Banco de Dados</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -52,6 +52,7 @@
 
         .status { text-align: center; margin-top: 5px; font-style: italic; color: #666; font-size: 14px; }
         .dica { text-align: center; font-size: 12px; color: #888; margin-bottom: 15px; }
+        .aviso-banco { text-align: center; font-size: 12px; color: #28a745; font-weight: bold; margin-bottom: 15px; }
 
         /* Estilo das Abas */
         .tab-buttons {
@@ -116,6 +117,11 @@
         .linha-baixa td { background-color: #f8f9fa; color: #999; }
         .linha-baixa td:nth-child(3) { text-decoration: line-through; }
 
+        .acoes-finais {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
         #btnExportar {
             background-color: #28a745;
             color: white;
@@ -125,8 +131,18 @@
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
+            flex: 2;
+        }
+        #btnLimpar {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
         }
     </style>
 </head>
@@ -136,7 +152,9 @@
 
     <div class="card">
         <label>Comando de Voz</label>
-        <p class="dica">Fale no formato: <b>"Nome da pessoa" + pegou/retirou + "nome da ferramenta"</b><br>(Ex: <i>"Carlos pegou uma furadeira"</i>)</p>
+        <p class="dica">Fale no formato: <b>"Nome" + pegou/retirou + "ferramenta"</b><br>(Ex: <i>"Carlos pegou uma furadeira"</i>)</p>
+        <p class="aviso-banco">💾 Salvamento Automático Ativado</p>
+        
         <button id="btnGravar">🎙️ Tocar para Falar</button>
         <div class="status" id="statusTexto">Aguardando...</div>
     </div>
@@ -162,7 +180,11 @@
             <tbody>
             </tbody>
         </table>
-        <button id="btnExportar" onclick="exportarTabela()">Baixar Relatório em CSV</button>
+        
+        <div class="acoes-finais">
+            <button id="btnExportar" onclick="exportarTabela()">Baixar Relatório em CSV</button>
+            <button id="btnLimpar" onclick="limparBancoDados()">Limpar Tudo</button>
+        </div>
     </div>
 
     <!-- Conteúdo da Aba 2: Funcionários -->
@@ -181,10 +203,24 @@
     </div>
 
     <script>
-        // Objeto para gerenciar o cadastro dinâmico dos funcionários
-        const funcionariosCadastrados = {};
+        // ==========================================
+        // 1. SISTEMA DE BANCO DE DADOS (LOCALSTORAGE)
+        // ==========================================
+        
+        // Puxa os dados salvos no navegador ou cria vazios se for a primeira vez
+        let funcionariosCadastrados = JSON.parse(localStorage.getItem('agil_funcionarios')) || {};
+        let historicoEmprestimos = JSON.parse(localStorage.getItem('agil_historico')) || [];
 
-        // Sistema de Troca de Abas
+        // Função que salva tudo no navegador
+        function salvarNoBancoDeDados() {
+            localStorage.setItem('agil_funcionarios', JSON.stringify(funcionariosCadastrados));
+            localStorage.setItem('agil_historico', JSON.stringify(historicoEmprestimos));
+        }
+
+        // ==========================================
+        // 2. INTERFACE E NAVEGAÇÃO
+        // ==========================================
+
         function alternarAba(nomeAba) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativo'));
             document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('ativo'));
@@ -198,11 +234,12 @@
             }
         }
 
-        // Configuração de Reconhecimento de Voz
+        // ==========================================
+        // 3. RECONHECIMENTO DE VOZ
+        // ==========================================
+
         const btnGravar = document.getElementById('btnGravar');
         const statusTexto = document.getElementById('statusTexto');
-        const tabelaHistorico = document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0];
-        const tabelaFuncionarios = document.getElementById('tabelaFuncionarios').getElementsByTagName('tbody')[0];
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
@@ -240,11 +277,12 @@
             };
         }
 
-        // Inteligência para separar NOME e FERRAMENTA sem precisar de planilha
+        // ==========================================
+        // 4. LÓGICA DE PROCESSAMENTO
+        // ==========================================
+
         function processarAudio(frase) {
             frase = frase.trim();
-            
-            // Verbos comuns de ação
             const regexVerbos = /\b(pegou|retirou|levou|solicitou|pediu|pega|esta com|está com)\b/i;
             const match = frase.match(regexVerbos);
 
@@ -254,29 +292,40 @@
             if (match) {
                 const verbIndex = match.index;
                 const verbLength = match[0].length;
-
-                // O que está ANTES do verbo é o NOME
                 nome = frase.substring(0, verbIndex).trim();
-                
-                // O que está DEPOIS do verbo é a FERRAMENTA
                 ferramenta = frase.substring(verbIndex + verbLength).trim();
             } else {
-                // Caso a pessoa fale sem verbo (Ex: "João Martelo"), separa a 1ª palavra do restante
                 const palavras = frase.split(/\s+/);
                 nome = palavras[0];
                 ferramenta = palavras.slice(1).join(" ");
             }
 
-            // Limpa artigos/conectivos da ferramenta (ex: "uma furadeira" -> "furadeira")
             ferramenta = ferramenta.replace(/^(uma|um|o|a|os|as|de|do|da)\s+/i, "").trim();
 
-            // Trata e formata
             nome = capitalizar(nome) || "Não identificado";
             ferramenta = capitalizar(ferramenta) || "Ferramenta não identificada";
 
-            // Registra no sistema
+            // Cria um ID único para esse empréstimo
+            const idEmprestimo = Date.now().toString();
+            const agora = new Date();
+            const dataHora = `${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR').substring(0, 5)}`;
+
+            // 1. Atualiza Funcionario
             registrarFuncionario(nome, ferramenta);
-            adicionarNaTabelaHistorico(nome, ferramenta);
+
+            // 2. Adiciona no Histórico Array
+            historicoEmprestimos.unshift({
+                id: idEmprestimo,
+                dataHora: dataHora,
+                nome: nome,
+                ferramenta: ferramenta,
+                status: 'em uso',
+                horaDevolucao: null
+            });
+
+            // 3. Salva e Renderiza
+            salvarNoBancoDeDados();
+            renderizarTelas();
         }
 
         function capitalizar(texto) {
@@ -284,10 +333,8 @@
             return texto.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         }
 
-        // Atualiza o cadastro na "Aba Funcionários"
         function registrarFuncionario(nome, ferramenta) {
             const chaveNome = nome.toLowerCase();
-
             if (!funcionariosCadastrados[chaveNome]) {
                 funcionariosCadastrados[chaveNome] = {
                     nomeOriginal: nome,
@@ -295,18 +342,49 @@
                     ferramentasEmUso: []
                 };
             }
-
             funcionariosCadastrados[chaveNome].totalRetiradas += 1;
             funcionariosCadastrados[chaveNome].ferramentasEmUso.push(ferramenta);
-
-            renderizarTabelaFuncionarios();
         }
 
-        // Atualiza a visualização da Aba Funcionários
-        function renderizarTabelaFuncionarios() {
-            tabelaFuncionarios.innerHTML = "";
-            const chaves = Object.keys(funcionariosCadastrados);
+        // ==========================================
+        // 5. RENDERIZAÇÃO E BAIXAS
+        // ==========================================
+
+        function renderizarTelas() {
+            const tabelaHistorico = document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0];
+            const tabelaFuncionarios = document.getElementById('tabelaFuncionarios').getElementsByTagName('tbody')[0];
             
+            // Limpa as tabelas para recriar com os dados do banco
+            tabelaHistorico.innerHTML = "";
+            tabelaFuncionarios.innerHTML = "";
+
+            // Renderiza Histórico
+            historicoEmprestimos.forEach(item => {
+                const linha = tabelaHistorico.insertRow();
+                
+                if (item.status === 'devolvido') {
+                    linha.classList.add('linha-baixa');
+                }
+
+                linha.insertCell(0).innerText = item.dataHora;
+                linha.insertCell(1).innerText = item.nome;
+                linha.insertCell(2).innerText = item.ferramenta;
+                
+                const celulaStatus = linha.insertCell(3);
+                if (item.status === 'em uso') {
+                    celulaStatus.innerHTML = '<span class="status-badge status-em-uso">Em uso</span>';
+                } else {
+                    celulaStatus.innerHTML = `<span class="status-badge status-devolvido">Devolvido às ${item.horaDevolucao}</span>`;
+                }
+                
+                const celulaAcao = linha.insertCell(4);
+                if (item.status === 'em uso') {
+                    celulaAcao.innerHTML = `<button class="btn-baixa" onclick="darBaixa('${item.id}', '${item.nome.toLowerCase()}', '${item.ferramenta}')">Devolver</button>`;
+                }
+            });
+
+            // Renderiza Funcionários
+            const chaves = Object.keys(funcionariosCadastrados);
             document.getElementById('totalFuncionarios').innerText = chaves.length;
 
             chaves.forEach(chave => {
@@ -316,7 +394,6 @@
                 linha.insertCell(0).innerText = func.nomeOriginal;
                 linha.insertCell(1).innerText = func.totalRetiradas;
                 
-                // Mostra ferramentas pendentes ou se não tem nenhuma com ele
                 const ferramentasTexto = func.ferramentasEmUso.length > 0 
                     ? func.ferramentasEmUso.join(", ") 
                     : "Nenhuma (Devolvidas)";
@@ -325,50 +402,30 @@
             });
         }
 
-        // Adiciona registro na tabela principal
-        function adicionarNaTabelaHistorico(nome, ferramenta) {
-            const agora = new Date();
-            const dataHora = `${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR').substring(0, 5)}`;
-            
-            const novaLinha = tabelaHistorico.insertRow(0);
-            novaLinha.setAttribute('data-nome', nome.toLowerCase());
-            novaLinha.setAttribute('data-ferramenta', ferramenta);
-            
-            novaLinha.insertCell(0).innerText = dataHora;
-            novaLinha.insertCell(1).innerText = nome;
-            novaLinha.insertCell(2).innerText = ferramenta;
-            
-            const celulaStatus = novaLinha.insertCell(3);
-            celulaStatus.innerHTML = '<span class="status-badge status-em-uso">Em uso</span>';
-            
-            const celulaAcao = novaLinha.insertCell(4);
-            celulaAcao.innerHTML = '<button class="btn-baixa" onclick="darBaixa(this)">Devolver</button>';
-        }
+        function darBaixa(id, nomeKey, ferramenta) {
+            // Atualiza o histórico
+            const item = historicoEmprestimos.find(i => i.id === id);
+            if (item) {
+                const agora = new Date();
+                item.status = 'devolvido';
+                item.horaDevolucao = agora.toLocaleTimeString('pt-BR').substring(0, 5);
+            }
 
-        // Função para devolver a ferramenta
-        function darBaixa(botao) {
-            const linha = botao.parentNode.parentNode;
-            const celulaStatus = linha.cells[3];
-            
-            const nomeKey = linha.getAttribute('data-nome');
-            const ferramenta = linha.getAttribute('data-ferramenta');
-            
-            const agora = new Date();
-            const horaBaixa = agora.toLocaleTimeString('pt-BR').substring(0, 5);
-            
-            celulaStatus.innerHTML = `<span class="status-badge status-devolvido">Devolvido às ${horaBaixa}</span>`;
-            linha.classList.add('linha-baixa');
-            botao.style.display = 'none';
-
-            // Remove a ferramenta da lista de posse do funcionário
+            // Remove a ferramenta da aba de funcionários
             if (funcionariosCadastrados[nomeKey]) {
                 const index = funcionariosCadastrados[nomeKey].ferramentasEmUso.indexOf(ferramenta);
                 if (index > -1) {
                     funcionariosCadastrados[nomeKey].ferramentasEmUso.splice(index, 1);
                 }
-                renderizarTabelaFuncionarios();
             }
+
+            salvarNoBancoDeDados();
+            renderizarTelas();
         }
+
+        // ==========================================
+        // 6. EXPORTAR E LIMPAR
+        // ==========================================
 
         function exportarTabela() {
             let csv = ['\uFEFF'];
@@ -395,6 +452,21 @@
             link.click();
             document.body.removeChild(link);
         }
+
+        function limparBancoDados() {
+            if(confirm("ATENÇÃO: Tem certeza que deseja apagar TODOS os registros? Isso não pode ser desfeito!")) {
+                localStorage.removeItem('agil_funcionarios');
+                localStorage.removeItem('agil_historico');
+                funcionariosCadastrados = {};
+                historicoEmprestimos = [];
+                renderizarTelas();
+                alert("Banco de dados limpo com sucesso!");
+            }
+        }
+
+        // Ao abrir a página pela primeira vez, renderiza o que está salvo no banco
+        window.onload = renderizarTelas;
+
     </script>
 </body>
 </html>
