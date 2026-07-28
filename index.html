@@ -3,915 +3,398 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Estoque Engesp - Almoxarifado</title>
+    <title>ControleÁgil - Voz</title>
     <style>
-        :root {
-            --primary: #1e293b;
-            --engesp-dark: #004d40; /* Verde escuro da logo */
-            --engesp-light: #7a8b2b; /* Verde oliva das curvas */
-            --accent-civil: #2563eb;
-            --accent-antichama: #dc2626;
-            --accent-calcado: #d97706;
-            --success: #16a34a;
-            --warning: #d97706;
-            --bg-body: #f1f5f9;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            line-height: 1.5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            padding: 20px;
+            margin: 0;
         }
-
-        /* =========================================
-           LOGO ENGESP EM CÓDIGO (CSS/SVG)
-        ========================================= */
-        .engesp-logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-        }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
         
-        .engesp-logo svg {
-            margin-bottom: -18px; /* Puxa o texto para perto das curvas */
-            width: 100%;
-            max-width: 280px;
-        }
-
-        .engesp-text {
-            font-family: 'Arial Black', Impact, sans-serif;
-            font-size: 58px;
-            color: var(--engesp-dark);
-            line-height: 1;
-            letter-spacing: -2px;
-            text-transform: lowercase;
-            margin-bottom: 2px;
-        }
-
-        .engesp-sub {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            font-size: 14px;
-            color: var(--engesp-light);
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        /* =========================================
-           TELA DE LOGIN
-        ========================================= */
-        #login-screen {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 420px;
-            border-top: 6px solid var(--engesp-dark);
-        }
-
-        .login-card .engesp-logo {
-            margin-bottom: 40px;
-        }
-
-        .login-error {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 16px;
-            display: none;
-        }
-
-        /* =========================================
-           SISTEMA PRINCIPAL (OCULTO POR PADRÃO)
-        ========================================= */
-        #app-screen {
-            display: none;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1050px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        header {
-            background-color: white;
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        /* NAVEGAÇÃO POR ABAS */
-        .nav-tabs {
-            display: flex;
-            background-color: #f8fafc;
-            border-bottom: 1px solid var(--border-color);
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            background: none;
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            border-bottom: 3px solid transparent;
-        }
-
-        .tab-btn:hover {
-            color: var(--engesp-dark);
-            background-color: #e2e8f0;
-        }
-
-        .tab-btn.active {
-            color: var(--engesp-dark);
-            border-bottom-color: var(--engesp-dark);
-            background-color: white;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 24px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* CONTROLES DE BUSCA E FILTRO */
-        .estoque-controles {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            background: #f8fafc;
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .busca-container {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .busca-container input {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            font-size: 15px;
-        }
-
-        .contador-total {
-            background-color: var(--engesp-dark);
-            color: white;
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 16px;
-            white-space: nowrap;
-        }
-
-        .filter-container {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            width: 100%;
-        }
-
-        .filter-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            background: white;
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .filter-btn.active {
-            background: var(--engesp-dark);
-            color: white;
-            border-color: var(--engesp-dark);
-        }
-
-        /* GRID DE CARDS */
-        .estoque-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
         .card {
             background: white;
-            border-radius: 8px;
-            padding: 16px;
-            border: 1px solid var(--border-color);
-            border-top: 4px solid var(--accent-civil);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-
-        .card.antichama { border-top-color: var(--accent-antichama); }
-        .card.calcado { border-top-color: var(--accent-calcado); }
-
-        .card-tag {
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-
-        .card.civil .card-tag { background-color: #dbeafe; color: var(--accent-civil); }
-        .card.antichama .card-tag { background-color: #fee2e2; color: var(--accent-antichama); }
-        .card.calcado .card-tag { background-color: #fef3c7; color: var(--accent-calcado); }
-
-        .card h3 { font-size: 15px; color: var(--text-main); margin-bottom: 10px; }
-        .card .qtd { font-size: 26px; font-weight: 800; color: var(--engesp-dark); }
-        .card .alerta-baixo { margin-top: 8px; font-size: 12px; color: var(--warning); font-weight: 700; }
-
-        /* FORMULÁRIOS */
-        .form-card {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fafafa;
-            border: 1px solid var(--border-color);
-            padding: 24px;
-            border-radius: 8px;
-        }
-
-        .form-card.entrada-card { border-top: 4px solid var(--success); }
-        .form-card.saida-card { border-top: 4px solid var(--accent-antichama); }
-
-        .form-group { margin-bottom: 16px; }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 15px;
-            background-color: white;
-            outline: none;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--engesp-dark);
-            box-shadow: 0 0 0 2px rgba(0, 77, 64, 0.1);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 700;
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+        
+        #btnGravar {
+            background-color: #007bff;
             color: white;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: opacity 0.2s;
-        }
-
-        .btn-submit:hover { opacity: 0.9; }
-        
-        /* Cores dos botões */
-        .btn-login { background-color: var(--engesp-dark); }
-        .btn-entrada { background-color: var(--success); }
-        .btn-saida { background-color: var(--accent-antichama); }
-
-        /* TABELA DE HISTÓRICO */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th { background-color: #f1f5f9; color: var(--text-muted); font-weight: 700; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
-        td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
-
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 700; }
-        .badge-entrada { background-color: #dcfce7; color: #15803d; }
-        .badge-saida { background-color: #fee2e2; color: #b91c1c; }
-
-        .btn-reset {
-            background: none;
-            border: 1px solid #fca5a5;
-            color: #dc2626;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-        
-        .header-actions {
-            display: flex;
-            justify-content: flex-end;
-            padding: 10px 20px;
-            background: #e2e8f0;
-        }
-        
-        .btn-logout {
-            background: none;
             border: none;
-            color: var(--text-main);
-            font-weight: 600;
+            padding: 20px;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+            margin-bottom: 10px;
             cursor: pointer;
+        }
+        #btnGravar.gravando {
+            background-color: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); box-shadow: 0 0 15px rgba(220, 53, 69, 0.6); }
+            100% { transform: scale(1); }
+        }
+
+        .status { text-align: center; margin-top: 5px; font-style: italic; color: #666; font-size: 14px; }
+        .dica { text-align: center; font-size: 12px; color: #888; margin-bottom: 15px; }
+
+        /* Estilo das Abas */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
             font-size: 14px;
         }
-        .btn-logout:hover { color: var(--accent-antichama); }
-
-        /* =========================================
-           ASSINATURA DO DESENVOLVEDOR (KODA STUDIO)
-        ========================================= */
-        .assinatura-dev {
-            text-align: center;
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px dashed #cbd5e1;
-            user-select: none;
+        .tab-btn.ativo {
+            background-color: #007bff;
+            color: white;
         }
+        .tab-content { display: none; }
+        .tab-content.ativo { display: block; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th { background-color: #f1f1f1; }
+        .table-container { overflow-x: auto; }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .status-em-uso { background-color: #ffeeba; color: #856404; }
+        .status-devolvido { background-color: #d4edda; color: #155724; }
         
-        .assinatura-dev strong {
-            color: var(--engesp-dark);
-            font-weight: 700;
-            letter-spacing: 0.5px;
+        .btn-baixa {
+            background-color: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
         }
+        .btn-baixa:hover { background-color: #e0a800; }
+        .linha-baixa td { background-color: #f8f9fa; color: #999; }
+        .linha-baixa td:nth-child(3) { text-decoration: line-through; }
 
+        #btnExportar {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
 
-<!-- ================= TELA DE LOGIN ================= -->
-<div id="login-screen">
-    <div class="login-card">
-        
-        <!-- LOGO DESENHADA EM CÓDIGO (CSS) -->
-        <div class="engesp-logo">
-            <svg viewBox="0 0 300 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 42 Q 150 12 290 8" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                <path d="M20 47 Q 160 17 280 13" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                <path d="M30 52 Q 170 22 270 18" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            </svg>
-            <div class="engesp-text">engesp</div>
-            <div class="engesp-sub">Gestão de Estoque</div>
-        </div>
+    <h2>ControleÁgil</h2>
 
-        <div id="login-error" class="login-error">
-            ⚠️ Usuário ou senha incorretos.
-        </div>
-
-        <form id="form-login">
-            <div class="form-group">
-                <label for="login-user">Usuário</label>
-                <input type="text" id="login-user" required placeholder="Digite seu usuário">
-            </div>
-            <div class="form-group">
-                <label for="login-pass">Senha</label>
-                <input type="password" id="login-pass" required placeholder="Digite sua senha">
-            </div>
-            <button type="submit" class="btn-submit btn-login">Acessar Sistema</button>
-
-            <!-- ASSINATURA NA TELA DE LOGIN -->
-            <div class="assinatura-dev">
-                Desenvolvido por <strong>Koda Studio Artes</strong> 🚀
-            </div>
-            
-        </form>
-    </div>
-</div>
-
-<!-- ================= SISTEMA PRINCIPAL ================= -->
-<div id="app-screen">
-    
-    <div class="header-actions">
-        <span id="user-display" style="margin-right: 15px; font-size: 14px; font-weight: 600; color: #64748b;"></span>
-        <button class="btn-logout" onclick="fazerLogout()">🚪 Sair</button>
+    <div class="card">
+        <label>Comando de Voz</label>
+        <p class="dica">Fale no formato: <b>"Nome da pessoa" + pegou/retirou + "nome da ferramenta"</b><br>(Ex: <i>"Carlos pegou uma furadeira"</i>)</p>
+        <button id="btnGravar">🎙️ Tocar para Falar</button>
+        <div class="status" id="statusTexto">Aguardando...</div>
     </div>
 
-    <div class="container">
-        <header>
-            <!-- A MESMA LOGO NO CABEÇALHO DO SISTEMA -->
-            <div class="engesp-logo" style="margin: 0 auto 10px auto;">
-                <svg viewBox="0 0 300 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10 42 Q 150 12 290 8" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                    <path d="M20 47 Q 160 17 280 13" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                    <path d="M30 52 Q 170 22 270 18" stroke="#7a8b2b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                </svg>
-                <div class="engesp-text">engesp</div>
-                <div class="engesp-sub">Gestão de Estoque</div>
-            </div>
-            <p style="color: #64748b; font-size: 14px; margin-top: 15px;">Almoxarifado: Controle de Uniformes e EPIs</p>
-        </header>
-
-        <!-- NAVEGAÇÃO POR ABAS -->
-        <nav class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('estoque')">📊 Estoque Atual</button>
-            <button class="tab-btn" onclick="switchTab('entrada')">📥 Registrar Entrada</button>
-            <button class="tab-btn" onclick="switchTab('saida')">📤 Registrar Saída</button>
-            <button class="tab-btn" onclick="switchTab('historico')">📑 Histórico</button>
-        </nav>
-
-        <!-- ABA 1: ESTOQUE ATUAL -->
-        <div id="tab-estoque" class="tab-content active">
-            <div class="estoque-controles">
-                <div class="busca-container">
-                    <input type="text" id="campo-busca" placeholder="🔍 Buscar por número (ex: 41), tamanho (ex: GG), peça..." onkeyup="renderEstoque()">
-                </div>
-                <div class="contador-total" id="contador-pecas">
-                    Total: 0 peças
-                </div>
-                
-                <div class="filter-container">
-                    <button class="filter-btn active" onclick="filtrarEstoque('todos', this)">Todos</button>
-                    <button class="filter-btn" onclick="filtrarEstoque('camisa', this)">👔 Camisas</button>
-                    <button class="filter-btn" onclick="filtrarEstoque('calca', this)">👖 Calças</button>
-                    <button class="filter-btn" onclick="filtrarEstoque('botina', this)">🥾 Botinas</button>
-                    <button class="filter-btn" onclick="filtrarEstoque('civil', this)">Civil</button>
-                    <button class="filter-btn" onclick="filtrarEstoque('antichama', this)">Antichama</button>
-                </div>
-            </div>
-
-            <div class="estoque-grid" id="grid-estoque"></div>
-        </div>
-
-        <!-- ABA 2: REGISTRAR ENTRADA -->
-        <div id="tab-entrada" class="tab-content">
-            <div class="form-card entrada-card">
-                <h2 style="color: var(--success); margin-bottom: 20px;">📥 Registrar Entrada de Peças</h2>
-                <form id="form-entrada">
-                    <div class="form-group">
-                        <label for="ent-responsavel">Responsável / Origem / Nº Nota Fiscal:</label>
-                        <input type="text" id="ent-responsavel" required placeholder="Ex: Fornecedor / NF 1042">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ent-item">Selecione o Item:</label>
-                        <select id="ent-item" required class="select-uniformes"></select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ent-qtd">Quantidade Chegando / Inicial:</label>
-                        <input type="number" id="ent-qtd" required min="1" value="1">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ent-obs">Observação (Opcional):</label>
-                        <input type="text" id="ent-obs" placeholder="Ex: Inventário Inicial">
-                    </div>
-
-                    <button type="submit" class="btn-submit btn-entrada">➕ Adicionar ao Estoque</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- ABA 3: REGISTRAR SAÍDA -->
-        <div id="tab-saida" class="tab-content">
-            <div class="form-card saida-card">
-                <h2 style="color: var(--accent-antichama); margin-bottom: 20px;">📤 Registrar Retirada de Peça</h2>
-                <form id="form-saida">
-                    <div class="form-group">
-                        <label for="sai-funcionario">Nome do Funcionário:</label>
-                        <input type="text" id="sai-funcionario" required placeholder="Ex: Carlos Eduardo">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sai-item">Selecione o Item:</label>
-                        <select id="sai-item" required class="select-uniformes"></select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sai-qtd">Quantidade Retirada:</label>
-                        <input type="number" id="sai-qtd" required min="1" value="1">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sai-obs">Observação / Motivo (Opcional):</label>
-                        <input type="text" id="sai-obs" placeholder="Ex: Troca por desgaste">
-                    </div>
-
-                    <button type="submit" class="btn-submit btn-saida">➖ Confirmar Saída</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- ABA 4: HISTÓRICO -->
-        <div id="tab-historico" class="tab-content">
-            <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="color: var(--engesp-dark);">Histórico Completo</h2>
-                <select id="filtro-historico" onchange="renderHistorico()" style="width: auto; padding: 6px 12px;">
-                    <option value="todos">Todas as Movimentações</option>
-                    <option value="ENTRADA">Apenas Entradas</option>
-                    <option value="SAIDA">Apenas Saídas</option>
-                </select>
-            </div>
-
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data/Hora</th>
-                            <th>Tipo</th>
-                            <th>Item</th>
-                            <th>Qtd</th>
-                            <th>Pessoa / Resp.</th>
-                            <th>Saldo Restante</th>
-                            <th>Obs</th>
-                            <th>Usuário Sis.</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-historico"></tbody>
-                </table>
-            </div>
-
-            <div style="text-align: center;">
-                <button class="btn-reset" onclick="resetarSistema()">⚠️ Resetar Todo o Sistema</button>
-            </div>
-        </div>
-
-        <!-- ASSINATURA NO RODAPÉ DO SISTEMA -->
-        <div class="assinatura-dev" style="margin: 20px; padding-bottom: 20px; border-top: none;">
-            &copy; 2026 | Sistema criado e desenvolvido por <strong>Koda Studio Artes</strong>
-        </div>
-
+    <!-- Navegação por Abas -->
+    <div class="tab-buttons">
+        <button class="tab-btn ativo" onclick="alternarAba('historico')">📋 Histórico de Empréstimos</button>
+        <button class="tab-btn" onclick="alternarAba('funcionarios')">👤 Aba Funcionários (<span id="totalFuncionarios">0</span>)</button>
     </div>
-</div>
 
-<script>
-    // ==========================================
-    // LÓGICA DE LOGIN E AUTENTICAÇÃO
-    // ==========================================
-    const formLogin = document.getElementById('form-login');
-    const loginScreen = document.getElementById('login-screen');
-    const appScreen = document.getElementById('app-screen');
-    const loginError = document.getElementById('login-error');
-    const userDisplay = document.getElementById('user-display');
+    <!-- Conteúdo da Aba 1: Histórico -->
+    <div id="abaHistorico" class="tab-content ativo card table-container">
+        <table id="tabelaRegistros">
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Funcionário</th>
+                    <th>Ferramenta(s)</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button id="btnExportar" onclick="exportarTabela()">Baixar Relatório em CSV</button>
+    </div>
 
-    // Verifica se já fez login na sessão atual (evita logar de novo ao dar F5)
-    let usuarioLogado = sessionStorage.getItem('engesp_usuario_logado');
-    if (usuarioLogado) {
-        liberarAcesso(usuarioLogado);
-    }
+    <!-- Conteúdo da Aba 2: Funcionários -->
+    <div id="abaFuncionarios" class="tab-content card table-container">
+        <table id="tabelaFuncionarios">
+            <thead>
+                <tr>
+                    <th>Nome do Funcionário</th>
+                    <th>Total de Retiradas</th>
+                    <th>Ferramentas com Ele Agora</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 
-    formLogin.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Pega o usuário digitado e converte para minúsculo para aceitar (Larissa ou larissa)
-        const user = document.getElementById('login-user').value.trim().toLowerCase();
-        const pass = document.getElementById('login-pass').value;
+    <script>
+        // Objeto para gerenciar o cadastro dinâmico dos funcionários
+        const funcionariosCadastrados = {};
 
-        // Validação de Credenciais solicitadas
-        if (user === 'larissa' && pass === 'lari123') {
-            iniciarSessao('Larissa');
-        } 
-        else if (user === 'kaka' && pass === '789456') {
-            iniciarSessao('Kaka');
-        } 
-        else {
-            // Falha no login
-            loginError.style.display = 'block';
-            document.getElementById('login-pass').value = ''; // Limpa a senha
+        // Sistema de Troca de Abas
+        function alternarAba(nomeAba) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativo'));
+            document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('ativo'));
+
+            if (nomeAba === 'historico') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('ativo');
+                document.getElementById('abaHistorico').classList.add('ativo');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('ativo');
+                document.getElementById('abaFuncionarios').classList.add('ativo');
+            }
         }
-    });
 
-    function iniciarSessao(nomeUser) {
-        sessionStorage.setItem('engesp_usuario_logado', nomeUser);
-        usuarioLogado = nomeUser;
-        liberarAcesso(nomeUser);
-    }
+        // Configuração de Reconhecimento de Voz
+        const btnGravar = document.getElementById('btnGravar');
+        const statusTexto = document.getElementById('statusTexto');
+        const tabelaHistorico = document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0];
+        const tabelaFuncionarios = document.getElementById('tabelaFuncionarios').getElementsByTagName('tbody')[0];
 
-    function liberarAcesso(nomeUser) {
-        loginScreen.style.display = 'none';
-        appScreen.style.display = 'block';
-        userDisplay.innerText = `Olá, ${nomeUser}`;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
-        // Inicia o render do sistema após logar
-        popularSelects();
-        renderEstoque();
-    }
+        if (!SpeechRecognition) {
+            statusTexto.innerText = "Navegador não suporta reconhecimento de voz.";
+            btnGravar.disabled = true;
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.interimResults = false;
 
-    function fazerLogout() {
-        sessionStorage.removeItem('engesp_usuario_logado');
-        usuarioLogado = null;
-        appScreen.style.display = 'none';
-        loginScreen.style.display = 'flex';
-        formLogin.reset();
-        loginError.style.display = 'none';
-    }
+            btnGravar.addEventListener('click', () => {
+                recognition.start();
+                btnGravar.classList.add('gravando');
+                btnGravar.innerText = "Ouvindo...";
+                statusTexto.innerText = "Diga quem pegou o quê...";
+            });
 
-
-    // ==========================================
-    // LÓGICA DO ALMOXARIFADO (ESTOQUE)
-    // ==========================================
-    const estoquePadrao = {
-        // CIVIL - CAMISAS
-        civil_camisa_p:    { nome: 'Camisa Civil - P',    tipo: 'civil', peca: 'camisa', qtd: 0 },
-        civil_camisa_m:    { nome: 'Camisa Civil - M',    tipo: 'civil', peca: 'camisa', qtd: 0 },
-        civil_camisa_g:    { nome: 'Camisa Civil - G',    tipo: 'civil', peca: 'camisa', qtd: 0 },
-        civil_camisa_gg:   { nome: 'Camisa Civil - GG',   tipo: 'civil', peca: 'camisa', qtd: 0 },
-        civil_camisa_exg:  { nome: 'Camisa Civil - EXG',  tipo: 'civil', peca: 'camisa', qtd: 0 },
-        civil_camisa_exgg: { nome: 'Camisa Civil - EXGG', tipo: 'civil', peca: 'camisa', qtd: 0 },
-
-        // CIVIL - CALÇAS
-        civil_calca_p:    { nome: 'Calça Civil - P',    tipo: 'civil', peca: 'calca', qtd: 0 },
-        civil_calca_m:    { nome: 'Calça Civil - M',    tipo: 'civil', peca: 'calca', qtd: 0 },
-        civil_calca_g:    { nome: 'Calça Civil - G',    tipo: 'civil', peca: 'calca', qtd: 0 },
-        civil_calca_gg:   { nome: 'Calça Civil - GG',   tipo: 'civil', peca: 'calca', qtd: 0 },
-        civil_calca_exg:  { nome: 'Calça Civil - EXG',  tipo: 'civil', peca: 'calca', qtd: 0 },
-        civil_calca_exgg: { nome: 'Calça Civil - EXGG', tipo: 'civil', peca: 'calca', qtd: 0 },
-
-        // ANTICHAMA - CAMISAS
-        antichama_camisa_p:    { nome: 'Camisa Antichama - P',    tipo: 'antichama', peca: 'camisa', qtd: 0 },
-        antichama_camisa_m:    { nome: 'Camisa Antichama - M',    tipo: 'antichama', peca: 'camisa', qtd: 0 },
-        antichama_camisa_g:    { nome: 'Camisa Antichama - G',    tipo: 'antichama', peca: 'camisa', qtd: 0 },
-        antichama_camisa_gg:   { nome: 'Camisa Antichama - GG',   tipo: 'antichama', peca: 'camisa', qtd: 0 },
-        antichama_camisa_exg:  { nome: 'Camisa Antichama - EXG',  tipo: 'antichama', peca: 'camisa', qtd: 0 },
-        antichama_camisa_exgg: { nome: 'Camisa Antichama - EXGG', tipo: 'antichama', peca: 'camisa', qtd: 0 },
-
-        // ANTICHAMA - CALÇAS
-        antichama_calca_p:    { nome: 'Calça Antichama - P',    tipo: 'antichama', peca: 'calca', qtd: 0 },
-        antichama_calca_m:    { nome: 'Calça Antichama - M',    tipo: 'antichama', peca: 'calca', qtd: 0 },
-        antichama_calca_g:    { nome: 'Calça Antichama - G',    tipo: 'antichama', peca: 'calca', qtd: 0 },
-        antichama_calca_gg:   { nome: 'Calça Antichama - GG',   tipo: 'antichama', peca: 'calca', qtd: 0 },
-        antichama_calca_exg:  { nome: 'Calça Antichama - EXG',  tipo: 'antichama', peca: 'calca', qtd: 0 },
-        antichama_calca_exgg: { nome: 'Calça Antichama - EXGG', tipo: 'antichama', peca: 'calca', qtd: 0 },
-
-        // BOTINAS / CALÇADOS
-        botina_35: { nome: 'Botina - 35', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_36: { nome: 'Botina - 36', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_37: { nome: 'Botina - 37', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_38: { nome: 'Botina - 38', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_39: { nome: 'Botina - 39', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_40: { nome: 'Botina - 40', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_41: { nome: 'Botina - 41', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_42: { nome: 'Botina - 42', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_43: { nome: 'Botina - 43', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_44: { nome: 'Botina - 44', tipo: 'calcado', peca: 'botina', qtd: 0 },
-        botina_45: { nome: 'Botina - 45', tipo: 'calcado', peca: 'botina', qtd: 0 }
-    };
-
-    let estoque = JSON.parse(localStorage.getItem('almox_estoque_v4')) || estoquePadrao;
-    let historico = JSON.parse(localStorage.getItem('almox_historico_v4')) || [];
-    let filtroEstoqueAtual = 'todos';
-
-    function salvar() {
-        localStorage.setItem('almox_estoque_v4', JSON.stringify(estoque));
-        localStorage.setItem('almox_historico_v4', JSON.stringify(historico));
-    }
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-        document.getElementById(`tab-${tabId}`).classList.add('active');
-        event.currentTarget.classList.add('active');
-
-        if (tabId === 'estoque') renderEstoque();
-        if (tabId === 'historico') renderHistorico();
-    }
-
-    function popularSelects() {
-        const selects = document.querySelectorAll('.select-uniformes');
-        selects.forEach(select => {
-            select.innerHTML = '<option value="">Selecione o item...</option>';
-
-            const grupos = {
-                civil_camisa: document.createElement('optgroup'),
-                civil_calca: document.createElement('optgroup'),
-                antichama_camisa: document.createElement('optgroup'),
-                antichama_calca: document.createElement('optgroup'),
-                calcado_botina: document.createElement('optgroup')
+            recognition.onresult = (event) => {
+                const frase = event.results[0][0].transcript;
+                statusTexto.innerText = `Você disse: "${frase}"`;
+                processarAudio(frase);
             };
 
-            grupos.civil_camisa.label = "👕 Camisas Civis";
-            grupos.civil_calca.label = "👖 Calças Civis";
-            grupos.antichama_camisa.label = "🔥👕 Camisas Antichama";
-            grupos.antichama_calca.label = "🔥👖 Calças Antichama";
-            grupos.calcado_botina.label = "🥾 Botinas de Segurança";
+            recognition.onspeechend = () => {
+                recognition.stop();
+                btnGravar.classList.remove('gravando');
+                btnGravar.innerText = "🎙️ Tocar para Falar";
+            };
 
-            for (let key in estoque) {
-                const item = estoque[key];
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = `${item.nome} (${item.qtd} un. em estoque)`;
+            recognition.onerror = (event) => {
+                statusTexto.innerText = "Erro ao ouvir. Tente novamente.";
+                btnGravar.classList.remove('gravando');
+                btnGravar.innerText = "🎙️ Tocar para Falar";
+            };
+        }
 
-                let grupoChave = `${item.tipo}_${item.peca}`;
-                if (item.tipo === 'calcado') {
-                    grupoChave = 'calcado_botina';
+        // Inteligência para separar NOME e FERRAMENTA sem precisar de planilha
+        function processarAudio(frase) {
+            frase = frase.trim();
+            
+            // Verbos comuns de ação
+            const regexVerbos = /\b(pegou|retirou|levou|solicitou|pediu|pega|esta com|está com)\b/i;
+            const match = frase.match(regexVerbos);
+
+            let nome = "";
+            let ferramenta = "";
+
+            if (match) {
+                const verbIndex = match.index;
+                const verbLength = match[0].length;
+
+                // O que está ANTES do verbo é o NOME
+                nome = frase.substring(0, verbIndex).trim();
+                
+                // O que está DEPOIS do verbo é a FERRAMENTA
+                ferramenta = frase.substring(verbIndex + verbLength).trim();
+            } else {
+                // Caso a pessoa fale sem verbo (Ex: "João Martelo"), separa a 1ª palavra do restante
+                const palavras = frase.split(/\s+/);
+                nome = palavras[0];
+                ferramenta = palavras.slice(1).join(" ");
+            }
+
+            // Limpa artigos/conectivos da ferramenta (ex: "uma furadeira" -> "furadeira")
+            ferramenta = ferramenta.replace(/^(uma|um|o|a|os|as|de|do|da)\s+/i, "").trim();
+
+            // Trata e formata
+            nome = capitalizar(nome) || "Não identificado";
+            ferramenta = capitalizar(ferramenta) || "Ferramenta não identificada";
+
+            // Registra no sistema
+            registrarFuncionario(nome, ferramenta);
+            adicionarNaTabelaHistorico(nome, ferramenta);
+        }
+
+        function capitalizar(texto) {
+            if (!texto) return "";
+            return texto.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        // Atualiza o cadastro na "Aba Funcionários"
+        function registrarFuncionario(nome, ferramenta) {
+            const chaveNome = nome.toLowerCase();
+
+            if (!funcionariosCadastrados[chaveNome]) {
+                funcionariosCadastrados[chaveNome] = {
+                    nomeOriginal: nome,
+                    totalRetiradas: 0,
+                    ferramentasEmUso: []
+                };
+            }
+
+            funcionariosCadastrados[chaveNome].totalRetiradas += 1;
+            funcionariosCadastrados[chaveNome].ferramentasEmUso.push(ferramenta);
+
+            renderizarTabelaFuncionarios();
+        }
+
+        // Atualiza a visualização da Aba Funcionários
+        function renderizarTabelaFuncionarios() {
+            tabelaFuncionarios.innerHTML = "";
+            const chaves = Object.keys(funcionariosCadastrados);
+            
+            document.getElementById('totalFuncionarios').innerText = chaves.length;
+
+            chaves.forEach(chave => {
+                const func = funcionariosCadastrados[chave];
+                const linha = tabelaFuncionarios.insertRow();
+                
+                linha.insertCell(0).innerText = func.nomeOriginal;
+                linha.insertCell(1).innerText = func.totalRetiradas;
+                
+                // Mostra ferramentas pendentes ou se não tem nenhuma com ele
+                const ferramentasTexto = func.ferramentasEmUso.length > 0 
+                    ? func.ferramentasEmUso.join(", ") 
+                    : "Nenhuma (Devolvidas)";
+                
+                linha.insertCell(2).innerText = ferramentasTexto;
+            });
+        }
+
+        // Adiciona registro na tabela principal
+        function adicionarNaTabelaHistorico(nome, ferramenta) {
+            const agora = new Date();
+            const dataHora = `${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR').substring(0, 5)}`;
+            
+            const novaLinha = tabelaHistorico.insertRow(0);
+            novaLinha.setAttribute('data-nome', nome.toLowerCase());
+            novaLinha.setAttribute('data-ferramenta', ferramenta);
+            
+            novaLinha.insertCell(0).innerText = dataHora;
+            novaLinha.insertCell(1).innerText = nome;
+            novaLinha.insertCell(2).innerText = ferramenta;
+            
+            const celulaStatus = novaLinha.insertCell(3);
+            celulaStatus.innerHTML = '<span class="status-badge status-em-uso">Em uso</span>';
+            
+            const celulaAcao = novaLinha.insertCell(4);
+            celulaAcao.innerHTML = '<button class="btn-baixa" onclick="darBaixa(this)">Devolver</button>';
+        }
+
+        // Função para devolver a ferramenta
+        function darBaixa(botao) {
+            const linha = botao.parentNode.parentNode;
+            const celulaStatus = linha.cells[3];
+            
+            const nomeKey = linha.getAttribute('data-nome');
+            const ferramenta = linha.getAttribute('data-ferramenta');
+            
+            const agora = new Date();
+            const horaBaixa = agora.toLocaleTimeString('pt-BR').substring(0, 5);
+            
+            celulaStatus.innerHTML = `<span class="status-badge status-devolvido">Devolvido às ${horaBaixa}</span>`;
+            linha.classList.add('linha-baixa');
+            botao.style.display = 'none';
+
+            // Remove a ferramenta da lista de posse do funcionário
+            if (funcionariosCadastrados[nomeKey]) {
+                const index = funcionariosCadastrados[nomeKey].ferramentasEmUso.indexOf(ferramenta);
+                if (index > -1) {
+                    funcionariosCadastrados[nomeKey].ferramentasEmUso.splice(index, 1);
                 }
+                renderizarTabelaFuncionarios();
+            }
+        }
 
-                if (grupos[grupoChave]) {
-                    grupos[grupoChave].appendChild(option);
+        function exportarTabela() {
+            let csv = ['\uFEFF'];
+            let linhas = document.querySelectorAll("#tabelaRegistros tr");
+            
+            for (let i = 0; i < linhas.length; i++) {
+                let linha = [];
+                let colunas = linhas[i].querySelectorAll("td, th");
+                
+                for (let j = 0; j < colunas.length - 1; j++) {
+                    let texto = colunas[j].innerText.replace(/"/g, '""');
+                    linha.push('"' + texto + '"');
                 }
+                csv.push(linha.join(";"));
             }
-
-            for (let g in grupos) {
-                select.appendChild(grupos[g]);
-            }
-        });
-    }
-
-    function renderEstoque() {
-        const container = document.getElementById('grid-estoque');
-        const termoBusca = document.getElementById('campo-busca').value.toLowerCase();
-        const contadorElemento = document.getElementById('contador-pecas');
-        
-        container.innerHTML = '';
-        let totalPecas = 0;
-
-        for (let key in estoque) {
-            const item = estoque[key];
-
-            if (filtroEstoqueAtual === 'camisa' && item.peca !== 'camisa') continue;
-            if (filtroEstoqueAtual === 'calca' && item.peca !== 'calca') continue;
-            if (filtroEstoqueAtual === 'botina' && item.peca !== 'botina') continue;
-            if (filtroEstoqueAtual === 'civil' && item.tipo !== 'civil') continue;
-            if (filtroEstoqueAtual === 'antichama' && item.tipo !== 'antichama') continue;
-
-            if (termoBusca !== '') {
-                if (!item.nome.toLowerCase().includes(termoBusca)) continue;
-            }
-
-            totalPecas += item.qtd;
-
-            const card = document.createElement('div');
-            card.className = `card ${item.tipo}`;
-            const alerta = item.qtd <= 5 && item.qtd > 0 ? `<div class="alerta-baixo">⚠️ Baixo estoque!</div>` : '';
-            const alertaZero = item.qtd === 0 ? `<div class="alerta-baixo" style="color: #ef4444;">❌ Sem estoque</div>` : '';
-
-            card.innerHTML = `
-                <span class="card-tag">${item.tipo === 'calcado' ? 'EPI / Botina' : `${item.tipo} - ${item.peca}`}</span>
-                <h3>${item.nome}</h3>
-                <div class="qtd">${item.qtd} <span style="font-size:14px; font-weight:normal;">un.</span></div>
-                ${alerta}
-                ${alertaZero}
-            `;
-            container.appendChild(card);
+            
+            let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+            let link = document.createElement("a");
+            let dataHoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+            
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", `Historico_Emprestimos_${dataHoje}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
-
-        contadorElemento.innerHTML = `Total: ${totalPecas} peças`;
-    }
-
-    function filtrarEstoque(tipo, btn) {
-        filtroEstoqueAtual = tipo;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderEstoque();
-    }
-
-    document.getElementById('form-entrada').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const itemKey = document.getElementById('ent-item').value;
-        const qtd = parseInt(document.getElementById('ent-qtd').value);
-        const responsavel = document.getElementById('ent-responsavel').value;
-        const obs = document.getElementById('ent-obs').value || '-';
-
-        estoque[itemKey].qtd += qtd;
-        
-        // Adiciona ao histórico registrando quem fez a ação no sistema
-        historico.push({
-            data: new Date().toLocaleString('pt-BR'),
-            tipo: 'ENTRADA',
-            itemNome: estoque[itemKey].nome,
-            qtd: qtd,
-            pessoa: responsavel,
-            saldo: estoque[itemKey].qtd,
-            obs: obs,
-            usuarioSistema: usuarioLogado 
-        });
-
-        salvar();
-        popularSelects();
-        alert(`✅ ENTRADA REGISTRADA!\n+${qtd} un. de ${estoque[itemKey].nome}.\nNovo Saldo: ${estoque[itemKey].qtd} unidades.`);
-        this.reset();
-        document.getElementById('ent-qtd').value = 1;
-    });
-
-    document.getElementById('form-saida').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const itemKey = document.getElementById('sai-item').value;
-        const qtd = parseInt(document.getElementById('sai-qtd').value);
-        const funcionario = document.getElementById('sai-funcionario').value;
-        const obs = document.getElementById('sai-obs').value || '-';
-
-        if (estoque[itemKey].qtd < qtd) {
-            alert(`❌ ESTOQUE INSUFICIENTE!\nSaldo disponível de ${estoque[itemKey].nome}: ${estoque[itemKey].qtd} un.`);
-            return;
-        }
-
-        estoque[itemKey].qtd -= qtd;
-        
-        // Adiciona ao histórico registrando quem fez a ação no sistema
-        historico.push({
-            data: new Date().toLocaleString('pt-BR'),
-            tipo: 'SAIDA',
-            itemNome: estoque[itemKey].nome,
-            qtd: qtd,
-            pessoa: funcionario,
-            saldo: estoque[itemKey].qtd,
-            obs: obs,
-            usuarioSistema: usuarioLogado
-        });
-
-        salvar();
-        popularSelects();
-        alert(`✅ SAÍDA REGISTRADA!\nFuncionário: ${funcionario}\nRetirado: ${qtd}x ${estoque[itemKey].nome}\nSaldo Restante: ${estoque[itemKey].qtd} unidades.`);
-        this.reset();
-        document.getElementById('sai-qtd').value = 1;
-    });
-
-    function renderHistorico() {
-        const tbody = document.getElementById('tabela-historico');
-        const filtro = document.getElementById('filtro-historico').value;
-        tbody.innerHTML = '';
-
-        [...historico].reverse().forEach(reg => {
-            if (filtro !== 'todos' && reg.tipo !== filtro) return;
-
-            const tr = document.createElement('tr');
-            const isEntrada = reg.tipo === 'ENTRADA';
-            const badgeClass = isEntrada ? 'badge-entrada' : 'badge-saida';
-            const sinal = isEntrada ? '+' : '-';
-            const userSys = reg.usuarioSistema || 'Desconhecido';
-
-            tr.innerHTML = `
-                <td>${reg.data}</td>
-                <td><span class="badge ${badgeClass}">${reg.tipo}</span></td>
-                <td><strong>${reg.itemNome}</strong></td>
-                <td><strong>${sinal}${reg.qtd}</strong></td>
-                <td>${reg.pessoa}</td>
-                <td><strong>${reg.saldo} un.</strong></td>
-                <td style="color:#64748b; font-size:13px;">${reg.obs}</td>
-                <td style="font-size:12px; font-weight:bold; color:var(--engesp-dark)">${userSys}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function resetarSistema() {
-        if (confirm("⚠️ Tem certeza que deseja apagar os dados salvos e resetar o sistema para ZERO?")) {
-            localStorage.removeItem('almox_estoque_v4');
-            localStorage.removeItem('almox_historico_v4');
-            location.reload();
-        }
-    }
-</script>
+    </script>
 </body>
 </html>
