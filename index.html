@@ -3,228 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ControleÁgil - Voz & Banco de Dados</title>
+    <title>Gestão Flash - Ferramentas (Engesp)</title>
+    
+    <!-- Bibliotecas para Gerar o PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
     <style>
+        /* Paleta de Cores Engesp */
+        :root {
+            --verde-escuro: #00473b; 
+            --verde-oliva: #8c9933;
+            --fundo: #f4f7f6;
+            --texto: #333333;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            color: #333;
+            background-color: var(--fundo);
+            color: var(--texto);
             padding: 20px;
             margin: 0;
         }
-        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+
+        /* Topo / Localização */
+        .local-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .local-bar input {
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: var(--verde-escuro);
+        }
+
+        /* Cabeçalho Gestão Flash */
+        .main-header {
+            background-color: var(--verde-escuro);
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .main-header h1 { margin: 0; font-size: 28px; text-transform: uppercase; }
+        .logo-accent { height: 6px; background-color: var(--verde-oliva); width: 100%; position: absolute; bottom: 0; left: 0; }
         
         .card {
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             margin-bottom: 20px;
         }
-        label { font-weight: bold; display: block; margin-bottom: 5px; }
         
         #btnGravar {
-            background-color: #007bff;
+            background-color: var(--verde-escuro);
             color: white;
             border: none;
-            padding: 20px;
+            padding: 15px;
             width: 100%;
             font-size: 18px;
             font-weight: bold;
             border-radius: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-            margin-bottom: 10px;
             cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 71, 59, 0.3);
         }
-        #btnGravar.gravando {
-            background-color: #dc3545;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); box-shadow: 0 0 15px rgba(220, 53, 69, 0.6); }
-            100% { transform: scale(1); }
-        }
+        #btnGravar.gravando { background-color: #dc3545; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
 
         .status { text-align: center; margin-top: 5px; font-style: italic; color: #666; font-size: 14px; }
-        .dica { text-align: center; font-size: 12px; color: #888; margin-bottom: 15px; }
-        .aviso-banco { text-align: center; font-size: 12px; color: #28a745; font-weight: bold; margin-bottom: 15px; }
 
-        /* Estilo das Abas */
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+        /* Abas */
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
         .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background-color: #e9ecef;
-            color: #495057;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
+            flex: 1; padding: 14px; border: none; background-color: #e9ecef;
+            color: #495057; font-weight: bold; border-radius: 8px; cursor: pointer;
         }
-        .tab-btn.ativo {
-            background-color: #007bff;
-            color: white;
-        }
+        .tab-btn.ativo { background-color: var(--verde-escuro); color: white; }
         .tab-content { display: none; }
         .tab-content.ativo { display: block; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 13px;
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-        th { background-color: #f1f1f1; }
-        .table-container { overflow-x: auto; }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            display: inline-block;
-        }
-        .status-em-uso { background-color: #ffeeba; color: #856404; }
+        /* Tabelas */
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: var(--verde-escuro); color: white; }
+        
+        .status-badge { padding: 6px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .status-em-uso { background-color: #fff3cd; color: #856404; }
         .status-devolvido { background-color: #d4edda; color: #155724; }
         
-        .btn-baixa {
-            background-color: #ffc107;
-            color: #212529;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
+        /* Botões de Ação na Tabela */
+        .btn-acao {
+            border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 11px; margin-right: 3px; margin-bottom: 3px; color: white;
         }
-        .btn-baixa:hover { background-color: #e0a800; }
-        .linha-baixa td { background-color: #f8f9fa; color: #999; }
-        .linha-baixa td:nth-child(3) { text-decoration: line-through; }
+        .btn-ver { background-color: #17a2b8; }
+        .btn-editar { background-color: #f0ad4e; }
+        .btn-excluir { background-color: #dc3545; }
+        .btn-pdf { background-color: var(--verde-escuro); }
+        .btn-baixa { background-color: var(--verde-oliva); color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
-        .acoes-finais {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
+        .acoes-finais { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-exportar-master { background-color: var(--verde-escuro); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; flex: 2; font-weight: bold; }
+
+        /* Painel Histórico */
+        .painel-controle { display: flex; justify-content: space-between; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; }
+        
+        /* Modal do Dia */
+        #modalDia {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000;
         }
-        #btnExportar {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            flex: 2;
-        }
-        #btnLimpar {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            flex: 1;
-        }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; }
+        .modal-close { float: right; cursor: pointer; font-weight: bold; font-size: 20px; color: red; }
     </style>
 </head>
 <body>
 
-    <h2>ControleÁgil</h2>
+    <!-- Configuração de Local e Data -->
+    <div class="local-bar">
+        <span>📍 Local da Obra:</span>
+        <input type="text" id="inputCidade" placeholder="Cidade (ex: Raul Soares)" oninput="salvarLocal()">
+        <input type="text" id="inputUF" placeholder="UF" maxlength="2" style="width: 50px;" oninput="salvarLocal()">
+    </div>
+
+    <header class="main-header">
+        <h1>Gestão Flash</h1>
+        <div class="logo-accent"></div>
+    </header>
 
     <div class="card">
-        <label>Comando de Voz</label>
-        <p class="dica">Fale no formato: <b>"Nome" + pegou/retirou + "ferramenta"</b><br>(Ex: <i>"Carlos pegou uma furadeira"</i>)</p>
-        <p class="aviso-banco">💾 Salvamento Automático Ativado</p>
-        
-        <button id="btnGravar">🎙️ Tocar para Falar</button>
+        <label>Comando de Voz 🎙️</label>
+        <button id="btnGravar">Tocar para Falar</button>
         <div class="status" id="statusTexto">Aguardando...</div>
     </div>
 
-    <!-- Navegação por Abas -->
     <div class="tab-buttons">
-        <button class="tab-btn ativo" onclick="alternarAba('historico')">📋 Histórico de Empréstimos</button>
-        <button class="tab-btn" onclick="alternarAba('funcionarios')">👤 Aba Funcionários (<span id="totalFuncionarios">0</span>)</button>
+        <button class="tab-btn ativo" onclick="alternarAba('historico')">📋 Histórico</button>
+        <button class="tab-btn" onclick="alternarAba('funcionarios')">👤 Funcionários (<span id="totalFuncionarios">0</span>)</button>
     </div>
 
-    <!-- Conteúdo da Aba 1: Histórico -->
-    <div id="abaHistorico" class="tab-content ativo card table-container">
-        <table id="tabelaRegistros">
-            <thead>
-                <tr>
-                    <th>Data/Hora</th>
-                    <th>Funcionário</th>
-                    <th>Ferramenta(s)</th>
-                    <th>Status</th>
-                    <th>Ação</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-        
+    <!-- Aba Histórico -->
+    <div id="abaHistorico" class="tab-content ativo card">
+        <div class="painel-controle">
+            <label><input type="checkbox" id="checkPendentes" onchange="aplicarFiltro()"> Ocultar Devolvidos</label>
+        </div>
+        <div style="overflow-x: auto;">
+            <table id="tabelaRegistros">
+                <thead><tr><th>Data/Hora</th><th>Funcionário</th><th>Ferramenta(s)</th><th>Status</th><th>Ação</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
         <div class="acoes-finais">
-            <button id="btnExportar" onclick="exportarTabela()">Baixar Relatório em CSV</button>
-            <button id="btnLimpar" onclick="limparBancoDados()">Limpar Tudo</button>
+            <button class="btn-exportar-master" onclick="gerarPDF(null)">📄 Gerar PDF (Geral da Obra)</button>
         </div>
     </div>
 
-    <!-- Conteúdo da Aba 2: Funcionários -->
-    <div id="abaFuncionarios" class="tab-content card table-container">
-        <table id="tabelaFuncionarios">
-            <thead>
-                <tr>
-                    <th>Nome do Funcionário</th>
-                    <th>Total de Retiradas</th>
-                    <th>Ferramentas com Ele Agora</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+    <!-- Aba Funcionários -->
+    <div id="abaFuncionarios" class="tab-content card">
+        <div style="overflow-x: auto;">
+            <table id="tabelaFuncionarios">
+                <thead><tr><th>Nome</th><th>Pendências Atuais</th><th>Ações do Cadastro</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para ver os itens pegos no dia -->
+    <div id="modalDia">
+        <div class="modal-content">
+            <span class="modal-close" onclick="fecharModal()">×</span>
+            <h3 id="tituloModal" style="margin-top:0;">Histórico do Dia</h3>
+            <ul id="listaDia" style="padding-left: 20px;"></ul>
+        </div>
     </div>
 
     <script>
-        // ==========================================
-        // 1. SISTEMA DE BANCO DE DADOS (LOCALSTORAGE)
-        // ==========================================
+        // Inicialização de Dados
+        let funcionariosCadastrados = JSON.parse(localStorage.getItem('flash_funcionarios')) || {};
+        let historicoEmprestimos = JSON.parse(localStorage.getItem('flash_historico')) || [];
         
-        // Puxa os dados salvos no navegador ou cria vazios se for a primeira vez
-        let funcionariosCadastrados = JSON.parse(localStorage.getItem('agil_funcionarios')) || {};
-        let historicoEmprestimos = JSON.parse(localStorage.getItem('agil_historico')) || [];
+        // Puxa cidade e UF salvos
+        document.getElementById('inputCidade').value = localStorage.getItem('flash_cidade') || "";
+        document.getElementById('inputUF').value = localStorage.getItem('flash_uf') || "";
 
-        // Função que salva tudo no navegador
         function salvarNoBancoDeDados() {
-            localStorage.setItem('agil_funcionarios', JSON.stringify(funcionariosCadastrados));
-            localStorage.setItem('agil_historico', JSON.stringify(historicoEmprestimos));
+            localStorage.setItem('flash_funcionarios', JSON.stringify(funcionariosCadastrados));
+            localStorage.setItem('flash_historico', JSON.stringify(historicoEmprestimos));
         }
 
-        // ==========================================
-        // 2. INTERFACE E NAVEGAÇÃO
-        // ==========================================
+        function salvarLocal() {
+            localStorage.setItem('flash_cidade', document.getElementById('inputCidade').value);
+            localStorage.setItem('flash_uf', document.getElementById('inputUF').value.toUpperCase());
+        }
 
         function alternarAba(nomeAba) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativo'));
             document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('ativo'));
-
             if (nomeAba === 'historico') {
                 document.querySelectorAll('.tab-btn')[0].classList.add('ativo');
                 document.getElementById('abaHistorico').classList.add('ativo');
@@ -234,66 +221,30 @@
             }
         }
 
-        // ==========================================
-        // 3. RECONHECIMENTO DE VOZ
-        // ==========================================
-
+        // Reconhecimento de Voz
         const btnGravar = document.getElementById('btnGravar');
         const statusTexto = document.getElementById('statusTexto');
-
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
-        if (!SpeechRecognition) {
-            statusTexto.innerText = "Navegador não suporta reconhecimento de voz.";
-            btnGravar.disabled = true;
-        } else {
+        if (SpeechRecognition) {
             const recognition = new SpeechRecognition();
             recognition.lang = 'pt-BR';
-            recognition.interimResults = false;
-
-            btnGravar.addEventListener('click', () => {
-                recognition.start();
-                btnGravar.classList.add('gravando');
-                btnGravar.innerText = "Ouvindo...";
-                statusTexto.innerText = "Diga quem pegou o quê...";
-            });
-
-            recognition.onresult = (event) => {
-                const frase = event.results[0][0].transcript;
-                statusTexto.innerText = `Você disse: "${frase}"`;
-                processarAudio(frase);
-            };
-
-            recognition.onspeechend = () => {
-                recognition.stop();
-                btnGravar.classList.remove('gravando');
-                btnGravar.innerText = "🎙️ Tocar para Falar";
-            };
-
-            recognition.onerror = (event) => {
-                statusTexto.innerText = "Erro ao ouvir. Tente novamente.";
-                btnGravar.classList.remove('gravando');
-                btnGravar.innerText = "🎙️ Tocar para Falar";
-            };
+            
+            btnGravar.addEventListener('click', () => { recognition.start(); btnGravar.classList.add('gravando'); });
+            recognition.onresult = (e) => { processarAudio(e.results[0][0].transcript); };
+            recognition.onspeechend = () => { recognition.stop(); btnGravar.classList.remove('gravando'); };
+            recognition.onerror = () => { statusTexto.innerText = "Erro ao ouvir."; btnGravar.classList.remove('gravando'); };
         }
-
-        // ==========================================
-        // 4. LÓGICA DE PROCESSAMENTO
-        // ==========================================
 
         function processarAudio(frase) {
             frase = frase.trim();
-            const regexVerbos = /\b(pegou|retirou|levou|solicitou|pediu|pega|esta com|está com)\b/i;
+            const regexVerbos = /\b(pegou|retirou|levou|solicitou|pega)\b/i;
             const match = frase.match(regexVerbos);
-
-            let nome = "";
-            let ferramenta = "";
+            let nome = "", ferramenta = "";
 
             if (match) {
-                const verbIndex = match.index;
-                const verbLength = match[0].length;
-                nome = frase.substring(0, verbIndex).trim();
-                ferramenta = frase.substring(verbIndex + verbLength).trim();
+                nome = frase.substring(0, match.index).trim();
+                ferramenta = frase.substring(match.index + match[0].length).trim();
             } else {
                 const palavras = frase.split(/\s+/);
                 nome = palavras[0];
@@ -301,172 +252,253 @@
             }
 
             ferramenta = ferramenta.replace(/^(uma|um|o|a|os|as|de|do|da)\s+/i, "").trim();
+            nome = capitalizar(nome) || "Desconhecido";
+            ferramenta = capitalizar(ferramenta) || "Não identificada";
 
-            nome = capitalizar(nome) || "Não identificado";
-            ferramenta = capitalizar(ferramenta) || "Ferramenta não identificada";
-
-            // Cria um ID único para esse empréstimo
-            const idEmprestimo = Date.now().toString();
             const agora = new Date();
             const dataHora = `${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR').substring(0, 5)}`;
+            const dataPura = agora.toLocaleDateString('pt-BR'); 
 
-            // 1. Atualiza Funcionario
             registrarFuncionario(nome, ferramenta);
-
-            // 2. Adiciona no Histórico Array
             historicoEmprestimos.unshift({
-                id: idEmprestimo,
-                dataHora: dataHora,
-                nome: nome,
-                ferramenta: ferramenta,
-                status: 'em uso',
-                horaDevolucao: null
+                id: Date.now().toString(), dataHora: dataHora, dataPura: dataPura,
+                nome: nome, ferramenta: ferramenta, status: 'em uso', horaDevolucao: null
             });
 
-            // 3. Salva e Renderiza
             salvarNoBancoDeDados();
             renderizarTelas();
+            statusTexto.innerText = "Registrado com sucesso!";
         }
 
-        function capitalizar(texto) {
-            if (!texto) return "";
-            return texto.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-        }
+        function capitalizar(texto) { return texto.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
 
         function registrarFuncionario(nome, ferramenta) {
-            const chaveNome = nome.toLowerCase();
-            if (!funcionariosCadastrados[chaveNome]) {
-                funcionariosCadastrados[chaveNome] = {
-                    nomeOriginal: nome,
-                    totalRetiradas: 0,
-                    ferramentasEmUso: []
-                };
+            const chave = nome.toLowerCase();
+            if (!funcionariosCadastrados[chave]) {
+                funcionariosCadastrados[chave] = { nomeOriginal: nome, ferramentasEmUso: [] };
             }
-            funcionariosCadastrados[chaveNome].totalRetiradas += 1;
-            funcionariosCadastrados[chaveNome].ferramentasEmUso.push(ferramenta);
+            funcionariosCadastrados[chave].ferramentasEmUso.push(ferramenta);
         }
 
-        // ==========================================
-        // 5. RENDERIZAÇÃO E BAIXAS
-        // ==========================================
-
         function renderizarTelas() {
-            const tabelaHistorico = document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0];
-            const tabelaFuncionarios = document.getElementById('tabelaFuncionarios').getElementsByTagName('tbody')[0];
+            const tabHist = document.querySelector('#tabelaRegistros tbody');
+            const tabFunc = document.querySelector('#tabelaFuncionarios tbody');
+            const apenasPendentes = document.getElementById('checkPendentes').checked;
             
-            // Limpa as tabelas para recriar com os dados do banco
-            tabelaHistorico.innerHTML = "";
-            tabelaFuncionarios.innerHTML = "";
+            tabHist.innerHTML = ""; tabFunc.innerHTML = "";
 
-            // Renderiza Histórico
             historicoEmprestimos.forEach(item => {
-                const linha = tabelaHistorico.insertRow();
-                
-                if (item.status === 'devolvido') {
-                    linha.classList.add('linha-baixa');
-                }
+                if (apenasPendentes && item.status === 'devolvido') return;
+                const tr = tabHist.insertRow();
+                if (item.status === 'devolvido') tr.style.color = "#aaa";
 
-                linha.insertCell(0).innerText = item.dataHora;
-                linha.insertCell(1).innerText = item.nome;
-                linha.insertCell(2).innerText = item.ferramenta;
+                tr.insertCell(0).innerText = item.dataHora;
+                tr.insertCell(1).innerText = item.nome;
+                tr.insertCell(2).innerText = item.status === 'devolvido' ? `~~${item.ferramenta}~~` : item.ferramenta;
                 
-                const celulaStatus = linha.insertCell(3);
-                if (item.status === 'em uso') {
-                    celulaStatus.innerHTML = '<span class="status-badge status-em-uso">Em uso</span>';
-                } else {
-                    celulaStatus.innerHTML = `<span class="status-badge status-devolvido">Devolvido às ${item.horaDevolucao}</span>`;
-                }
+                tr.insertCell(3).innerHTML = item.status === 'em uso' 
+                    ? '<span class="status-badge status-em-uso">Em Uso</span>' 
+                    : `<span class="status-badge status-devolvido">Devolvido ${item.horaDevolucao}</span>`;
                 
-                const celulaAcao = linha.insertCell(4);
-                if (item.status === 'em uso') {
-                    celulaAcao.innerHTML = `<button class="btn-baixa" onclick="darBaixa('${item.id}', '${item.nome.toLowerCase()}', '${item.ferramenta}')">Devolver</button>`;
-                }
+                tr.insertCell(4).innerHTML = item.status === 'em uso' 
+                    ? `<button class="btn-baixa" onclick="darBaixa('${item.id}', '${item.nome.toLowerCase()}', '${item.ferramenta}')">Devolver</button>` 
+                    : '-';
             });
 
-            // Renderiza Funcionários
             const chaves = Object.keys(funcionariosCadastrados);
             document.getElementById('totalFuncionarios').innerText = chaves.length;
 
             chaves.forEach(chave => {
                 const func = funcionariosCadastrados[chave];
-                const linha = tabelaFuncionarios.insertRow();
+                const tr = tabFunc.insertRow();
                 
-                linha.insertCell(0).innerText = func.nomeOriginal;
-                linha.insertCell(1).innerText = func.totalRetiradas;
+                tr.insertCell(0).innerText = func.nomeOriginal;
                 
-                const ferramentasTexto = func.ferramentasEmUso.length > 0 
-                    ? func.ferramentasEmUso.join(", ") 
-                    : "Nenhuma (Devolvidas)";
-                
-                linha.insertCell(2).innerText = ferramentasTexto;
+                const celulaPendencia = tr.insertCell(1);
+                celulaPendencia.innerHTML = func.ferramentasEmUso.length > 0 
+                    ? `<b style="color: #d9534f;">${func.ferramentasEmUso.join(", ")}</b>` 
+                    : "<span style='color: green;'>Nenhuma</span>";
+
+                const celulaAcoes = tr.insertCell(2);
+                celulaAcoes.innerHTML = `
+                    <button class="btn-acao btn-ver" onclick="verDia('${chave}')">📅 Ver Dia</button>
+                    <button class="btn-acao btn-editar" onclick="editarFuncionario('${chave}')">✏️ Editar</button>
+                    <button class="btn-acao btn-pdf" onclick="gerarPDF('${chave}')">📄 PDF</button>
+                    <button class="btn-acao btn-excluir" onclick="excluirFuncionario('${chave}')">🗑️ Excluir</button>
+                `;
             });
         }
 
-        function darBaixa(id, nomeKey, ferramenta) {
-            // Atualiza o histórico
-            const item = historicoEmprestimos.find(i => i.id === id);
-            if (item) {
-                const agora = new Date();
-                item.status = 'devolvido';
-                item.horaDevolucao = agora.toLocaleTimeString('pt-BR').substring(0, 5);
-            }
+        function aplicarFiltro() { renderizarTelas(); }
 
-            // Remove a ferramenta da aba de funcionários
+        function darBaixa(id, nomeKey, ferramenta) {
+            const item = historicoEmprestimos.find(i => i.id === id);
+            if (item) { item.status = 'devolvido'; item.horaDevolucao = new Date().toLocaleTimeString('pt-BR').substring(0, 5); }
             if (funcionariosCadastrados[nomeKey]) {
                 const index = funcionariosCadastrados[nomeKey].ferramentasEmUso.indexOf(ferramenta);
-                if (index > -1) {
-                    funcionariosCadastrados[nomeKey].ferramentasEmUso.splice(index, 1);
-                }
+                if (index > -1) funcionariosCadastrados[nomeKey].ferramentasEmUso.splice(index, 1);
             }
-
-            salvarNoBancoDeDados();
-            renderizarTelas();
+            salvarNoBancoDeDados(); renderizarTelas();
         }
 
-        // ==========================================
-        // 6. EXPORTAR E LIMPAR
-        // ==========================================
-
-        function exportarTabela() {
-            let csv = ['\uFEFF'];
-            let linhas = document.querySelectorAll("#tabelaRegistros tr");
+        function verDia(chave) {
+            const func = funcionariosCadastrados[chave];
+            const dataHoje = new Date().toLocaleDateString('pt-BR');
+            const itensDoDia = historicoEmprestimos.filter(h => h.nome.toLowerCase() === chave && h.dataPura === dataHoje);
             
-            for (let i = 0; i < linhas.length; i++) {
-                let linha = [];
-                let colunas = linhas[i].querySelectorAll("td, th");
+            const ul = document.getElementById('listaDia');
+            ul.innerHTML = "";
+            document.getElementById('tituloModal').innerText = `O que ${func.nomeOriginal} pegou hoje (${dataHoje})`;
+
+            if (itensDoDia.length === 0) {
+                ul.innerHTML = "<li>Nenhuma movimentação registrada hoje.</li>";
+            } else {
+                itensDoDia.forEach(item => {
+                    const status = item.status === 'em uso' ? '🔴 Ainda em uso' : `🟢 Devolvido às ${item.horaDevolucao}`;
+                    ul.innerHTML += `<li><b>${item.ferramenta}</b> - ${status} (${item.dataHora.split(' ')[1]})</li>`;
+                });
+            }
+            document.getElementById('modalDia').style.display = 'flex';
+        }
+
+        function fecharModal() { document.getElementById('modalDia').style.display = 'none'; }
+
+        function editarFuncionario(chaveAntiga) {
+            const func = funcionariosCadastrados[chaveAntiga];
+            const novoNome = prompt("Digite o novo nome para o funcionário:", func.nomeOriginal);
+            
+            if (novoNome && novoNome.trim() !== "" && novoNome !== func.nomeOriginal) {
+                const chaveNova = novoNome.toLowerCase();
+                funcionariosCadastrados[chaveNova] = { nomeOriginal: capitalizar(novoNome), ferramentasEmUso: func.ferramentasEmUso };
+                delete funcionariosCadastrados[chaveAntiga]; 
+                historicoEmprestimos.forEach(h => { if (h.nome.toLowerCase() === chaveAntiga) h.nome = capitalizar(novoNome); });
+                salvarNoBancoDeDados(); renderizarTelas();
+            }
+        }
+
+        function excluirFuncionario(chave) {
+            const func = funcionariosCadastrados[chave];
+            if (confirm(`ATENÇÃO! Deseja realmente excluir o cadastro de ${func.nomeOriginal}?`)) {
+                delete funcionariosCadastrados[chave];
+                salvarNoBancoDeDados(); renderizarTelas();
+            }
+        }
+
+        // --- GERADOR DE PDF COM LOGO OFICIAL ENGESP (TRAÇOS + NOME + SUBTÍTULO) ---
+        function gerarPDF(chaveFuncionario) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const cidade = document.getElementById('inputCidade').value || "Cidade não informada";
+            const uf = document.getElementById('inputUF').value || "UF";
+            const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            const hoje = new Date();
+            const dataExtenso = `${cidade} - ${uf}, ${hoje.getDate()} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+
+            let tituloRelatorio = "Relatório Geral de Ferramentas";
+            let dadosTabela = [];
+
+            // 1. DESENHO DA LOGO OFICIAL ENGESP (Traços + Nome + Subtítulo) no PDF
+            doc.setLineWidth(0.6);
+            
+            // Traço superior 1 (Verde Oliva)
+            doc.setDrawColor(140, 153, 51);
+            doc.line(14, 8, 55, 12);
+            
+            // Traço superior 2
+            doc.line(14, 11, 58, 14);
+            
+            // Traço superior 3 (Mais longo por cima)
+            doc.line(14, 14, 62, 16);
+
+            // Nome principal "engesp" em Verde Escuro
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(0, 71, 59);
+            doc.text("engesp", 14, 23);
+
+            // Subtítulo "Engenharia São Patrício" em Verde Oliva logo abaixo
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8.5);
+            doc.setTextColor(140, 153, 51);
+            doc.text("Engenharia São Patrício", 14.5, 27);
+
+
+            // 2. Títulos no Cabeçalho (Alinhados à direita)
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(0, 71, 59); 
+            doc.setFontSize(15);
+            doc.text("SISTEMA DE GESTÃO FLASH", 196, 15, { align: "right" });
+            
+            // Define Título Específico da Tabela
+            if (chaveFuncionario && funcionariosCadastrados[chaveFuncionario]) {
+                const nome = funcionariosCadastrados[chaveFuncionario].nomeOriginal;
+                tituloRelatorio = `Ficha do Funcionário: ${nome}`;
                 
-                for (let j = 0; j < colunas.length - 1; j++) {
-                    let texto = colunas[j].innerText.replace(/"/g, '""');
-                    linha.push('"' + texto + '"');
-                }
-                csv.push(linha.join(";"));
+                const historicoDele = historicoEmprestimos.filter(h => h.nome.toLowerCase() === chaveFuncionario);
+                dadosTabela = historicoDele.map(h => [ h.dataHora, h.ferramenta, h.status === 'em uso' ? 'PENDENTE' : 'Devolvido' ]);
+                
+                doc.setFontSize(11);
+                doc.setTextColor(100, 100, 100);
+                doc.text(tituloRelatorio, 196, 22, { align: "right" });
+
+                // Linha divisória verde-oliva
+                doc.setDrawColor(140, 153, 51);
+                doc.setLineWidth(0.4);
+                doc.line(14, 32, 196, 32);
+
+                doc.autoTable({
+                    startY: 37,
+                    head: [['Data / Hora', 'Ferramenta', 'Situação Atual']],
+                    body: dadosTabela,
+                    headStyles: { fillColor: [0, 71, 59] },
+                    styles: { fontSize: 10, cellPadding: 4 },
+                    alternateRowStyles: { fillColor: [245, 245, 245] }
+                });
+
+            } else {
+                doc.setFontSize(11);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Relatório Geral de Obras", 196, 22, { align: "right" });
+
+                // Linha divisória verde-oliva
+                doc.setDrawColor(140, 153, 51);
+                doc.setLineWidth(0.4);
+                doc.line(14, 32, 196, 32);
+                
+                const mostrarApenasPendentes = document.getElementById('checkPendentes').checked;
+                historicoEmprestimos.forEach(h => {
+                    if (mostrarApenasPendentes && h.status === 'devolvido') return;
+                    dadosTabela.push([ h.dataHora, h.nome, h.ferramenta, h.status === 'em uso' ? 'PENDENTE' : 'Devolvido' ]);
+                });
+
+                doc.autoTable({
+                    startY: 37,
+                    head: [['Data / Hora', 'Funcionário', 'Ferramenta', 'Situação']],
+                    body: dadosTabela,
+                    headStyles: { fillColor: [0, 71, 59] },
+                    styles: { fontSize: 10, cellPadding: 4 },
+                    alternateRowStyles: { fillColor: [245, 245, 245] }
+                });
             }
+
+            // 3. Rodapé de Assinatura e Local Automático
+            let alturaFinal = doc.lastAutoTable.finalY + 35; 
+            if (alturaFinal > 260) { doc.addPage(); alturaFinal = 35; }
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            doc.setTextColor(50, 50, 50);
             
-            let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-            let link = document.createElement("a");
-            let dataHoje = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-            
-            link.setAttribute("href", URL.createObjectURL(blob));
-            link.setAttribute("download", `Historico_Emprestimos_${dataHoje}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            doc.text("____________________________________________________", 105, alturaFinal, { align: "center" });
+            doc.text("Visto do Responsável / Almoxarifado", 105, alturaFinal + 6, { align: "center" });
+            doc.text(dataExtenso, 105, alturaFinal + 20, { align: "center" }); 
+
+            const nomeArquivo = chaveFuncionario ? `Relatorio_${chaveFuncionario}_${new Date().getTime()}.pdf` : 'Relatorio_Geral_Engesp.pdf';
+            doc.save(nomeArquivo);
         }
 
-        function limparBancoDados() {
-            if(confirm("ATENÇÃO: Tem certeza que deseja apagar TODOS os registros? Isso não pode ser desfeito!")) {
-                localStorage.removeItem('agil_funcionarios');
-                localStorage.removeItem('agil_historico');
-                funcionariosCadastrados = {};
-                historicoEmprestimos = [];
-                renderizarTelas();
-                alert("Banco de dados limpo com sucesso!");
-            }
-        }
-
-        // Ao abrir a página pela primeira vez, renderiza o que está salvo no banco
         window.onload = renderizarTelas;
-
     </script>
 </body>
 </html>
