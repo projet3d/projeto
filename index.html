@@ -14,6 +14,7 @@
         :root {
             --verde-escuro: #00473b; 
             --verde-oliva: #8c9933;
+            --verde-limao: #a2ff00;
             --fundo: #f4f7f6;
             --texto: #333333;
         }
@@ -24,6 +25,9 @@
             color: var(--texto);
             padding: 20px;
             margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         /* Topo / Localização */
@@ -59,39 +63,44 @@
             overflow: hidden;
         }
         .main-header h1 { margin: 0; font-size: 28px; text-transform: uppercase; }
+        .header-subtitle { margin: 5px 0 0 0; font-size: 15px; color: #e0f2f1; font-weight: 500; }
         .logo-accent { height: 6px; background-color: var(--verde-oliva); width: 100%; position: absolute; bottom: 0; left: 0; }
         
         .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+            background: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
         }
         
+        /* Botão de Voz */
         #btnGravar {
-            background-color: var(--verde-escuro);
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 71, 59, 0.3);
+            background: linear-gradient(45deg, var(--verde-escuro), var(--verde-oliva));
+            color: white; border: none; padding: 15px; width: 100%;
+            font-size: 18px; font-weight: bold; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 0 15px rgba(140, 153, 51, 0.5);
+            animation: pulse-idle 2s infinite; transition: all 0.2s ease;
+            user-select: none; -webkit-user-select: none; touch-action: manipulation;
         }
-        #btnGravar.gravando { background-color: #dc3545; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        #btnGravar.gravando { 
+            background: linear-gradient(45deg, var(--verde-oliva), var(--verde-limao));
+            color: var(--verde-escuro); transform: scale(0.96);
+            animation: pulse-active 0.6s infinite alternate; box-shadow: 0 0 30px rgba(162, 255, 0, 0.8);
+        }
 
-        .status { text-align: center; margin-top: 5px; font-style: italic; color: #666; font-size: 14px; }
+        @keyframes pulse-idle {
+            0% { box-shadow: 0 0 10px rgba(140, 153, 51, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 20px rgba(140, 153, 51, 0.7); transform: scale(1.02); }
+            100% { box-shadow: 0 0 10px rgba(140, 153, 51, 0.4); transform: scale(1); }
+        }
+        @keyframes pulse-active {
+            0% { box-shadow: 0 0 20px rgba(162, 255, 0, 0.6); }
+            100% { box-shadow: 0 0 45px rgba(162, 255, 0, 1); }
+        }
+
+        .status { text-align: center; margin-top: 8px; font-style: italic; color: #666; font-size: 15px; font-weight: 500;}
 
         /* Abas */
         .tab-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn {
-            flex: 1; padding: 14px; border: none; background-color: #e9ecef;
-            color: #495057; font-weight: bold; border-radius: 8px; cursor: pointer;
-        }
+        .tab-btn { flex: 1; padding: 14px; border: none; background-color: #e9ecef; color: #495057; font-weight: bold; border-radius: 8px; cursor: pointer; }
         .tab-btn.ativo { background-color: var(--verde-escuro); color: white; }
         .tab-content { display: none; }
         .tab-content.ativo { display: block; }
@@ -105,10 +114,8 @@
         .status-em-uso { background-color: #fff3cd; color: #856404; }
         .status-devolvido { background-color: #d4edda; color: #155724; }
         
-        /* Botões de Ação na Tabela */
-        .btn-acao {
-            border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 11px; margin-right: 3px; margin-bottom: 3px; color: white;
-        }
+        .btn-acao { border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 11px; margin-right: 3px; margin-bottom: 3px; color: white; }
+        .btn-ouvir { background-color: #6f42c1; } 
         .btn-ver { background-color: #17a2b8; }
         .btn-editar { background-color: #f0ad4e; }
         .btn-excluir { background-color: #dc3545; }
@@ -118,36 +125,35 @@
         .acoes-finais { display: flex; gap: 10px; margin-top: 20px; }
         .btn-exportar-master { background-color: var(--verde-escuro); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; flex: 2; font-weight: bold; }
 
-        /* Painel Histórico */
         .painel-controle { display: flex; justify-content: space-between; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; }
         
-        /* Modal do Dia */
-        #modalDia {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000;
-        }
+        #modalDia { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; }
         .modal-close { float: right; cursor: pointer; font-weight: bold; font-size: 20px; color: red; }
+
+        /* Rodapé */
+        .rodape-koda { margin-top: auto; text-align: center; padding: 20px 10px; font-size: 13px; color: #666; border-top: 1px solid #e0e0e0; }
+        .rodape-koda strong { color: var(--verde-escuro); font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <!-- Configuração de Local e Data -->
+    <header class="main-header">
+        <h1>Gestão Flash</h1>
+        <p class="header-subtitle">Controle de saída de ferramentas manuais</p>
+        <div class="logo-accent"></div>
+    </header>
+
     <div class="local-bar">
         <span>📍 Local da Obra:</span>
         <input type="text" id="inputCidade" placeholder="Cidade (ex: Raul Soares)" oninput="salvarLocal()">
         <input type="text" id="inputUF" placeholder="UF" maxlength="2" style="width: 50px;" oninput="salvarLocal()">
     </div>
 
-    <header class="main-header">
-        <h1>Gestão Flash</h1>
-        <div class="logo-accent"></div>
-    </header>
-
     <div class="card">
         <label>Comando de Voz 🎙️</label>
-        <button id="btnGravar">Tocar para Falar</button>
-        <div class="status" id="statusTexto">Aguardando...</div>
+        <button id="btnGravar">Segure para Falar</button>
+        <div class="status" id="statusTexto">Ex: Acho que o Claudinei pegou uma pá e um martelo.</div>
     </div>
 
     <div class="tab-buttons">
@@ -155,14 +161,13 @@
         <button class="tab-btn" onclick="alternarAba('funcionarios')">👤 Funcionários (<span id="totalFuncionarios">0</span>)</button>
     </div>
 
-    <!-- Aba Histórico -->
     <div id="abaHistorico" class="tab-content ativo card">
         <div class="painel-controle">
             <label><input type="checkbox" id="checkPendentes" onchange="aplicarFiltro()"> Ocultar Devolvidos</label>
         </div>
         <div style="overflow-x: auto;">
             <table id="tabelaRegistros">
-                <thead><tr><th>Data/Hora</th><th>Funcionário</th><th>Ferramenta(s)</th><th>Status</th><th>Ação</th></tr></thead>
+                <thead><tr><th>Funcionário</th><th>Data/Hora</th><th>Ferramenta(s)</th><th>Status</th><th>Ação</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
@@ -171,17 +176,15 @@
         </div>
     </div>
 
-    <!-- Aba Funcionários -->
     <div id="abaFuncionarios" class="tab-content card">
         <div style="overflow-x: auto;">
             <table id="tabelaFuncionarios">
-                <thead><tr><th>Nome</th><th>Pendências Atuais</th><th>Ações do Cadastro</th></tr></thead>
+                <thead><tr><th>Funcionários</th><th>Pendências Atuais</th><th>Ações do Cadastro</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
 
-    <!-- Modal para ver os itens pegos no dia -->
     <div id="modalDia">
         <div class="modal-content">
             <span class="modal-close" onclick="fecharModal()">×</span>
@@ -190,12 +193,14 @@
         </div>
     </div>
 
+    <footer class="rodape-koda">
+        Sistema desenvolvido e protegido por <strong>Koda Studio Artes</strong> &copy; 2026
+    </footer>
+
     <script>
-        // Inicialização de Dados
         let funcionariosCadastrados = JSON.parse(localStorage.getItem('flash_funcionarios')) || {};
         let historicoEmprestimos = JSON.parse(localStorage.getItem('flash_historico')) || [];
         
-        // Puxa cidade e UF salvos
         document.getElementById('inputCidade').value = localStorage.getItem('flash_cidade') || "";
         document.getElementById('inputUF').value = localStorage.getItem('flash_uf') || "";
 
@@ -221,62 +226,172 @@
             }
         }
 
-        // Reconhecimento de Voz
         const btnGravar = document.getElementById('btnGravar');
         const statusTexto = document.getElementById('statusTexto');
+        const textoPadrao = "Ex: Acho que o Claudinei pegou uma pá e um martelo.";
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
         if (SpeechRecognition) {
             const recognition = new SpeechRecognition();
             recognition.lang = 'pt-BR';
-            
-            btnGravar.addEventListener('click', () => { recognition.start(); btnGravar.classList.add('gravando'); });
+            recognition.interimResults = false; 
+            recognition.continuous = false; 
+
+            let isRecording = false;
+
+            const iniciarGravacao = (e) => {
+                if(e && e.cancelable) e.preventDefault();
+                if (isRecording) return;
+                try {
+                    recognition.start();
+                    isRecording = true;
+                    btnGravar.classList.add('gravando');
+                    btnGravar.innerText = "🎙️ Ouvindo... (Solte para registrar)";
+                    statusTexto.innerText = "Pode falar...";
+                } catch(err) { console.log("Reconhecimento já em andamento."); }
+            };
+
+            const pararGravacao = (e) => {
+                if(e && e.cancelable) e.preventDefault();
+                if (!isRecording) return;
+                recognition.stop(); 
+                isRecording = false;
+                btnGravar.classList.remove('gravando');
+                btnGravar.innerText = "Segure para Falar";
+                statusTexto.innerText = "Processando áudio...";
+            };
+
+            btnGravar.addEventListener('mousedown', iniciarGravacao);
+            btnGravar.addEventListener('mouseup', pararGravacao);
+            btnGravar.addEventListener('mouseleave', pararGravacao); 
+            btnGravar.addEventListener('touchstart', iniciarGravacao, {passive: false});
+            btnGravar.addEventListener('touchend', pararGravacao, {passive: false});
+            btnGravar.addEventListener('touchcancel', pararGravacao, {passive: false});
+
             recognition.onresult = (e) => { processarAudio(e.results[0][0].transcript); };
-            recognition.onspeechend = () => { recognition.stop(); btnGravar.classList.remove('gravando'); };
-            recognition.onerror = () => { statusTexto.innerText = "Erro ao ouvir."; btnGravar.classList.remove('gravando'); };
+            
+            recognition.onerror = (e) => { 
+                btnGravar.classList.remove('gravando'); 
+                btnGravar.innerText = "Segure para Falar";
+                isRecording = false;
+                if (e.error !== 'aborted') {
+                    statusTexto.innerText = "Não entendi bem. Tente novamente.";
+                    setTimeout(() => { statusTexto.innerText = textoPadrao; }, 3000);
+                } else {
+                    statusTexto.innerText = textoPadrao;
+                }
+            };
+
+            recognition.onspeechend = () => { 
+                isRecording = false;
+                btnGravar.classList.remove('gravando'); 
+                btnGravar.innerText = "Segure para Falar";
+            };
+        } else {
+            btnGravar.innerText = "Áudio incompatível com navegador";
+            btnGravar.disabled = true;
         }
 
         function processarAudio(frase) {
-            frase = frase.trim();
-            const regexVerbos = /\b(pegou|retirou|levou|solicitou|pega)\b/i;
+            frase = frase.replace(/[.,!?]/g, ' ').trim();
+            
+            // Procura a ação principal na frase
+            const regexVerbos = /\b(pegou|retirou|levou|solicitou|pega|pediu|está com|esta com)\b/i;
             const match = frase.match(regexVerbos);
-            let nome = "", ferramenta = "";
-
-            if (match) {
-                nome = frase.substring(0, match.index).trim();
-                ferramenta = frase.substring(match.index + match[0].length).trim();
-            } else {
-                const palavras = frase.split(/\s+/);
-                nome = palavras[0];
-                ferramenta = palavras.slice(1).join(" ");
+            
+            if (!match) {
+                statusTexto.innerHTML = `Ouvi: <b>"${frase}"</b><br><span style="color:red;">Não entendi a ação (ex: pegou, levou)!</span>`;
+                setTimeout(() => { statusTexto.innerText = textoPadrao; }, 5500);
+                return;
             }
 
-            ferramenta = ferramenta.replace(/^(uma|um|o|a|os|as|de|do|da)\s+/i, "").trim();
-            nome = capitalizar(nome) || "Desconhecido";
-            ferramenta = capitalizar(ferramenta) || "Não identificada";
+            let parteAntes = frase.substring(0, match.index).trim();
+            let parteDepois = frase.substring(match.index + match[0].length).trim();
 
+            // ============================================
+            // 1. ISOLAR APENAS O NOME DO FUNCIONÁRIO
+            // ============================================
+            let palavrasAntes = parteAntes.split(/\s+/);
+            // Lista de palavras que as pessoas falam antes do nome e que não importam
+            const lixoAntes = ['o','a','os','as','um','uma','que','ele','ela','eu','vi','disse','falei','hoje','agora','cedo','já','ja','lá','aqui','então','ai','aí','acho','acredito','falaram'];
+            
+            let palavrasNome = palavrasAntes.filter(p => !lixoAntes.includes(p.toLowerCase()));
+            let nome = palavrasNome.slice(-2).join(' '); // Pega no máximo os 2 últimos nomes (ex: João Pedro)
+            if (!nome) nome = "Desconhecido";
+            nome = capitalizar(nome);
+
+            // ============================================
+            // 2. ISOLAR AS FERRAMENTAS E CORTAR O RESTO
+            // ============================================
+            // Se a pessoa justificar ou falar local, o sistema corta fora
+            const regexCorteFim = /\b(para|pra|na|no|lá|aqui|porque|pois|logo|ali)\b/i;
+            const matchCorte = parteDepois.match(regexCorteFim);
+            if (matchCorte) {
+                parteDepois = parteDepois.substring(0, matchCorte.index).trim();
+            }
+
+            // Separa ferramentas caso tenha falado "e" ou uma vírgula
+            let listaFerramentasSujas = parteDepois.split(/\s+e\s+|,/i);
+            let ferramentasLimpas = [];
+
+            listaFerramentasSujas.forEach(f => {
+                let ferramenta = f.trim();
+                // Remove conexões no início
+                ferramenta = ferramenta.replace(/^(com a|com o|com as|com os|com|de|do|da)\b\s*/i, "").trim();
+                // Remove artigos no início
+                ferramenta = ferramenta.replace(/^(uma|um|duas|dois|três|tres|os|as|o|a)\b\s*/i, "").trim();
+                
+                if (ferramenta !== "") {
+                    ferramentasLimpas.push(capitalizar(ferramenta));
+                }
+            });
+
+            if (ferramentasLimpas.length === 0) {
+                statusTexto.innerHTML = `Ouvi: <b>"${frase}"</b><br><span style="color:red;">Não identifiquei a ferramenta!</span>`;
+                setTimeout(() => { statusTexto.innerText = textoPadrao; }, 5500);
+                return;
+            }
+
+            // ============================================
+            // 3. REGISTRAR AS FERRAMENTAS (SEPARADAMENTE)
+            // ============================================
             const agora = new Date();
             const dataHora = `${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR').substring(0, 5)}`;
             const dataPura = agora.toLocaleDateString('pt-BR'); 
 
-            registrarFuncionario(nome, ferramenta);
-            historicoEmprestimos.unshift({
-                id: Date.now().toString(), dataHora: dataHora, dataPura: dataPura,
-                nome: nome, ferramenta: ferramenta, status: 'em uso', horaDevolucao: null
+            ferramentasLimpas.forEach(ferramenta => {
+                // Gera um ID totalmente único pra cada item
+                const idUnico = Date.now().toString() + Math.random().toString(36).substring(2, 5); 
+                
+                registrarFuncionario(nome, ferramenta);
+                historicoEmprestimos.unshift({
+                    id: idUnico, 
+                    dataHora: dataHora, 
+                    dataPura: dataPura,
+                    nome: nome, 
+                    ferramenta: ferramenta, 
+                    status: 'em uso', 
+                    horaDevolucao: null
+                });
             });
 
             salvarNoBancoDeDados();
             renderizarTelas();
-            statusTexto.innerText = "Registrado com sucesso!";
+            
+            // Mostra o sucesso adaptado para a quantidade
+            let txtSucesso = ferramentasLimpas.length > 1 ? `${ferramentasLimpas.length} itens registrados` : `${ferramentasLimpas[0]} registrada`;
+            statusTexto.innerText = `✅ ${txtSucesso} para ${nome}!`;
+            setTimeout(() => { statusTexto.innerText = textoPadrao; }, 4000);
         }
 
-        function capitalizar(texto) { return texto.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+        function capitalizar(texto) { 
+            if (!texto) return "";
+            return texto.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); 
+        }
 
         function registrarFuncionario(nome, ferramenta) {
             const chave = nome.toLowerCase();
-            if (!funcionariosCadastrados[chave]) {
-                funcionariosCadastrados[chave] = { nomeOriginal: nome, ferramentasEmUso: [] };
-            }
+            if (!funcionariosCadastrados[chave]) { funcionariosCadastrados[chave] = { nomeOriginal: nome, ferramentasEmUso: [] }; }
             funcionariosCadastrados[chave].ferramentasEmUso.push(ferramenta);
         }
 
@@ -292,8 +407,8 @@
                 const tr = tabHist.insertRow();
                 if (item.status === 'devolvido') tr.style.color = "#aaa";
 
-                tr.insertCell(0).innerText = item.dataHora;
-                tr.insertCell(1).innerText = item.nome;
+                tr.insertCell(0).innerText = item.nome;
+                tr.insertCell(1).innerText = item.dataHora;
                 tr.insertCell(2).innerText = item.status === 'devolvido' ? `~~${item.ferramenta}~~` : item.ferramenta;
                 
                 tr.insertCell(3).innerHTML = item.status === 'em uso' 
@@ -301,8 +416,7 @@
                     : `<span class="status-badge status-devolvido">Devolvido ${item.horaDevolucao}</span>`;
                 
                 tr.insertCell(4).innerHTML = item.status === 'em uso' 
-                    ? `<button class="btn-baixa" onclick="darBaixa('${item.id}', '${item.nome.toLowerCase()}', '${item.ferramenta}')">Devolver</button>` 
-                    : '-';
+                    ? `<button class="btn-baixa" onclick="darBaixa('${item.id}', '${item.nome.toLowerCase()}', '${item.ferramenta}')">Devolver</button>` : '-';
             });
 
             const chaves = Object.keys(funcionariosCadastrados);
@@ -311,16 +425,15 @@
             chaves.forEach(chave => {
                 const func = funcionariosCadastrados[chave];
                 const tr = tabFunc.insertRow();
-                
                 tr.insertCell(0).innerText = func.nomeOriginal;
                 
                 const celulaPendencia = tr.insertCell(1);
                 celulaPendencia.innerHTML = func.ferramentasEmUso.length > 0 
-                    ? `<b style="color: #d9534f;">${func.ferramentasEmUso.join(", ")}</b>` 
-                    : "<span style='color: green;'>Nenhuma</span>";
+                    ? `<b style="color: #d9534f;">${func.ferramentasEmUso.join(", ")}</b>` : "<span style='color: green;'>Nenhuma</span>";
 
                 const celulaAcoes = tr.insertCell(2);
                 celulaAcoes.innerHTML = `
+                    <button class="btn-acao btn-ouvir" onclick="ouvirPendencias('${chave}')">🔊 Ouvir</button>
                     <button class="btn-acao btn-ver" onclick="verDia('${chave}')">📅 Ver Dia</button>
                     <button class="btn-acao btn-editar" onclick="editarFuncionario('${chave}')">✏️ Editar</button>
                     <button class="btn-acao btn-pdf" onclick="gerarPDF('${chave}')">📄 PDF</button>
@@ -340,6 +453,19 @@
             }
             salvarNoBancoDeDados(); renderizarTelas();
         }
+        
+        function ouvirPendencias(chave) {
+            if (!('speechSynthesis' in window)) { alert("Seu navegador não suporta leitura de voz."); return; }
+            const func = funcionariosCadastrados[chave];
+            let textoParaFalar = func.ferramentasEmUso.length > 0 
+                ? `O funcionário ${func.nomeOriginal} está devendo as seguintes ferramentas: ${func.ferramentasEmUso.join(", ")}.`
+                : `O funcionário ${func.nomeOriginal} não tem nenhuma pendência no momento.`;
+            
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(textoParaFalar);
+            utterance.lang = 'pt-BR'; 
+            window.speechSynthesis.speak(utterance);
+        }
 
         function verDia(chave) {
             const func = funcionariosCadastrados[chave];
@@ -350,9 +476,8 @@
             ul.innerHTML = "";
             document.getElementById('tituloModal').innerText = `O que ${func.nomeOriginal} pegou hoje (${dataHoje})`;
 
-            if (itensDoDia.length === 0) {
-                ul.innerHTML = "<li>Nenhuma movimentação registrada hoje.</li>";
-            } else {
+            if (itensDoDia.length === 0) { ul.innerHTML = "<li>Nenhuma movimentação registrada hoje.</li>"; } 
+            else {
                 itensDoDia.forEach(item => {
                     const status = item.status === 'em uso' ? '🔴 Ainda em uso' : `🟢 Devolvido às ${item.horaDevolucao}`;
                     ul.innerHTML += `<li><b>${item.ferramenta}</b> - ${status} (${item.dataHora.split(' ')[1]})</li>`;
@@ -366,7 +491,6 @@
         function editarFuncionario(chaveAntiga) {
             const func = funcionariosCadastrados[chaveAntiga];
             const novoNome = prompt("Digite o novo nome para o funcionário:", func.nomeOriginal);
-            
             if (novoNome && novoNome.trim() !== "" && novoNome !== func.nomeOriginal) {
                 const chaveNova = novoNome.toLowerCase();
                 funcionariosCadastrados[chaveNova] = { nomeOriginal: capitalizar(novoNome), ferramentasEmUso: func.ferramentasEmUso };
@@ -384,7 +508,6 @@
             }
         }
 
-        // --- GERADOR DE PDF COM LOGO OFICIAL ENGESP (TRAÇOS + NOME + SUBTÍTULO) ---
         function gerarPDF(chaveFuncionario) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -398,101 +521,46 @@
             let tituloRelatorio = "Relatório Geral de Ferramentas";
             let dadosTabela = [];
 
-            // 1. DESENHO DA LOGO OFICIAL ENGESP (Traços + Nome + Subtítulo) no PDF
             doc.setLineWidth(0.6);
-            
-            // Traço superior 1 (Verde Oliva)
             doc.setDrawColor(140, 153, 51);
-            doc.line(14, 8, 55, 12);
+            doc.line(14, 8, 55, 12); doc.line(14, 11, 58, 14); doc.line(14, 14, 62, 16);
+
+            doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(0, 71, 59); doc.text("engesp", 14, 23);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(140, 153, 51); doc.text("Engenharia São Patrício", 14.5, 27);
+            doc.setFont("helvetica", "bold"); doc.setTextColor(0, 71, 59); doc.setFontSize(15); doc.text("SISTEMA DE GESTÃO FLASH", 196, 15, { align: "right" });
             
-            // Traço superior 2
-            doc.line(14, 11, 58, 14);
-            
-            // Traço superior 3 (Mais longo por cima)
-            doc.line(14, 14, 62, 16);
-
-            // Nome principal "engesp" em Verde Escuro
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(22);
-            doc.setTextColor(0, 71, 59);
-            doc.text("engesp", 14, 23);
-
-            // Subtítulo "Engenharia São Patrício" em Verde Oliva logo abaixo
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8.5);
-            doc.setTextColor(140, 153, 51);
-            doc.text("Engenharia São Patrício", 14.5, 27);
-
-
-            // 2. Títulos no Cabeçalho (Alinhados à direita)
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(0, 71, 59); 
-            doc.setFontSize(15);
-            doc.text("SISTEMA DE GESTÃO FLASH", 196, 15, { align: "right" });
-            
-            // Define Título Específico da Tabela
             if (chaveFuncionario && funcionariosCadastrados[chaveFuncionario]) {
                 const nome = funcionariosCadastrados[chaveFuncionario].nomeOriginal;
                 tituloRelatorio = `Ficha do Funcionário: ${nome}`;
-                
                 const historicoDele = historicoEmprestimos.filter(h => h.nome.toLowerCase() === chaveFuncionario);
                 dadosTabela = historicoDele.map(h => [ h.dataHora, h.ferramenta, h.status === 'em uso' ? 'PENDENTE' : 'Devolvido' ]);
                 
-                doc.setFontSize(11);
-                doc.setTextColor(100, 100, 100);
-                doc.text(tituloRelatorio, 196, 22, { align: "right" });
+                doc.setFontSize(11); doc.setTextColor(100, 100, 100); doc.text(tituloRelatorio, 196, 22, { align: "right" });
+                doc.setDrawColor(140, 153, 51); doc.setLineWidth(0.4); doc.line(14, 32, 196, 32);
 
-                // Linha divisória verde-oliva
-                doc.setDrawColor(140, 153, 51);
-                doc.setLineWidth(0.4);
-                doc.line(14, 32, 196, 32);
-
-                doc.autoTable({
-                    startY: 37,
-                    head: [['Data / Hora', 'Ferramenta', 'Situação Atual']],
-                    body: dadosTabela,
-                    headStyles: { fillColor: [0, 71, 59] },
-                    styles: { fontSize: 10, cellPadding: 4 },
-                    alternateRowStyles: { fillColor: [245, 245, 245] }
-                });
-
+                doc.autoTable({ startY: 37, head: [['Data / Hora', 'Ferramenta', 'Situação Atual']], body: dadosTabela, headStyles: { fillColor: [0, 71, 59] }, styles: { fontSize: 10, cellPadding: 4 }, alternateRowStyles: { fillColor: [245, 245, 245] } });
             } else {
-                doc.setFontSize(11);
-                doc.setTextColor(100, 100, 100);
-                doc.text("Relatório Geral de Obras", 196, 22, { align: "right" });
-
-                // Linha divisória verde-oliva
-                doc.setDrawColor(140, 153, 51);
-                doc.setLineWidth(0.4);
-                doc.line(14, 32, 196, 32);
+                doc.setFontSize(11); doc.setTextColor(100, 100, 100); doc.text("Relatório Geral de Obras", 196, 22, { align: "right" });
+                doc.setDrawColor(140, 153, 51); doc.setLineWidth(0.4); doc.line(14, 32, 196, 32);
                 
                 const mostrarApenasPendentes = document.getElementById('checkPendentes').checked;
                 historicoEmprestimos.forEach(h => {
                     if (mostrarApenasPendentes && h.status === 'devolvido') return;
-                    dadosTabela.push([ h.dataHora, h.nome, h.ferramenta, h.status === 'em uso' ? 'PENDENTE' : 'Devolvido' ]);
+                    dadosTabela.push([ h.nome, h.dataHora, h.ferramenta, h.status === 'em uso' ? 'PENDENTE' : 'Devolvido' ]);
                 });
 
-                doc.autoTable({
-                    startY: 37,
-                    head: [['Data / Hora', 'Funcionário', 'Ferramenta', 'Situação']],
-                    body: dadosTabela,
-                    headStyles: { fillColor: [0, 71, 59] },
-                    styles: { fontSize: 10, cellPadding: 4 },
-                    alternateRowStyles: { fillColor: [245, 245, 245] }
-                });
+                doc.autoTable({ startY: 37, head: [['Funcionário', 'Data / Hora', 'Ferramenta', 'Situação']], body: dadosTabela, headStyles: { fillColor: [0, 71, 59] }, styles: { fontSize: 10, cellPadding: 4 }, alternateRowStyles: { fillColor: [245, 245, 245] } });
             }
 
-            // 3. Rodapé de Assinatura e Local Automático
             let alturaFinal = doc.lastAutoTable.finalY + 35; 
             if (alturaFinal > 260) { doc.addPage(); alturaFinal = 35; }
 
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(11);
-            doc.setTextColor(50, 50, 50);
-            
+            doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(50, 50, 50);
             doc.text("____________________________________________________", 105, alturaFinal, { align: "center" });
             doc.text("Visto do Responsável / Almoxarifado", 105, alturaFinal + 6, { align: "center" });
             doc.text(dataExtenso, 105, alturaFinal + 20, { align: "center" }); 
+            
+            doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.text("Gerado por Gestão Flash | Koda Studio Artes", 105, 290, { align: "center" }); 
 
             const nomeArquivo = chaveFuncionario ? `Relatorio_${chaveFuncionario}_${new Date().getTime()}.pdf` : 'Relatorio_Geral_Engesp.pdf';
             doc.save(nomeArquivo);
