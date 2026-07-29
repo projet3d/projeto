@@ -3,570 +3,692 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão Flash - Ferramentas (Engesp)</title>
+    <title>Gestão Flash - Controle de Ferramentas Manuais</title>
+    <!-- Fonte e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Biblioteca para gerar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <!-- Bibliotecas para Gerar o PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
     <style>
-        /* Paleta de Cores Engesp */
         :root {
-            --verde-escuro: #00473b; 
-            --verde-oliva: #8c9933;
-            --verde-limao: #a2ff00;
-            --fundo: #f4f7f6;
-            --texto: #333333;
+            /* Paleta de Cores baseada na logo da Engesp */
+            --dark-green: #004333;
+            --dark-green-light: #005a45;
+            --lime-green: #7a8a29;
+            --lime-hover: #8f9f38;
+            --success: #00875a;
+            --warning: #ff991f;
+            --danger: #de350b;
+            --info: #0065ff;
+            --dark: #172b4d;
+            --bg-body: #f4f6f8;
+            --bg-card: #ffffff;
+            --border: #dfe1e6;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--fundo);
-            color: var(--texto);
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--dark);
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            padding: 0;
         }
 
-        /* Topo / Localização */
-        .local-bar {
+        /* Cabeçalho */
+        .header {
+            background-color: var(--dark-green);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--lime-green);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .local-bar input {
-            border: 1px solid #ccc;
-            padding: 8px;
-            border-radius: 5px;
-            font-weight: bold;
-            color: var(--verde-escuro);
+        .header h1 span { color: var(--lime-green); }
+        .header p {
+            color: #e0f2e5;
+            margin: 10px 0 0 0;
+            font-size: 18px;
+            font-weight: 500;
         }
 
-        /* Cabeçalho Gestão Flash */
-        .main-header {
-            background-color: var(--verde-escuro);
-            color: white;
-            text-align: center;
-            padding: 25px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            position: relative;
-            overflow: hidden;
+        /* Container Principal */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
         }
-        .main-header h1 { margin: 0; font-size: 28px; text-transform: uppercase; }
-        .header-subtitle { margin: 5px 0 0 0; font-size: 15px; color: #e0f2f1; font-weight: 500; }
-        .logo-accent { height: 6px; background-color: var(--verde-oliva); width: 100%; position: absolute; bottom: 0; left: 0; }
-        
+
         .card {
-            background: white; padding: 20px; border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+
+        /* Barra de Ações (PDF) */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .btn-pdf {
+            background: var(--dark-green);
+            color: white;
+            border: 2px solid var(--dark-green);
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .btn-pdf:hover {
+            background: var(--dark-green-light);
+            border-color: var(--dark-green-light);
+        }
+
+        /* Registro Rápido */
+        .registro-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 20px;
+            position: relative;
         }
         
-        /* Botão de Voz */
-        #btnGravar {
-            background: linear-gradient(45deg, var(--verde-escuro), var(--verde-oliva));
-            color: white; border: none; padding: 15px; width: 100%;
-            font-size: 18px; font-weight: bold; border-radius: 50px;
-            cursor: pointer; box-shadow: 0 0 15px rgba(140, 153, 51, 0.5);
-            animation: pulse-idle 2s infinite; transition: all 0.2s ease;
-            user-select: none; -webkit-user-select: none; touch-action: manipulation;
+        @media (max-width: 768px) {
+            .registro-grid { grid-template-columns: 1fr; } 
         }
-        #btnGravar.gravando { 
-            background: linear-gradient(45deg, var(--verde-oliva), var(--verde-limao));
-            color: var(--verde-escuro); transform: scale(0.96);
-            animation: pulse-active 0.6s infinite alternate; box-shadow: 0 0 30px rgba(162, 255, 0, 0.8);
+        
+        .input-group { position: relative; width: 100%; }
+        .input-group i { position: absolute; left: 15px; top: 16px; color: #8a94a5; }
+        .form-input {
+            width: 100%;
+            padding: 14px 14px 14px 40px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px; 
+            box-sizing: border-box;
+            outline: none;
         }
+        .form-input:focus { border-color: var(--dark-green-light); box-shadow: 0 0 0 3px rgba(0, 67, 51, 0.1); }
+        
+        .btn-add {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0 35px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            height: 50px;
+        }
+        .btn-add:hover { background: #006644; }
 
-        @keyframes pulse-idle {
-            0% { box-shadow: 0 0 10px rgba(140, 153, 51, 0.4); transform: scale(1); }
-            50% { box-shadow: 0 0 20px rgba(140, 153, 51, 0.7); transform: scale(1.02); }
-            100% { box-shadow: 0 0 10px rgba(140, 153, 51, 0.4); transform: scale(1); }
+        /* Autocomplete Limpo */
+        .autocomplete-results {
+            position: absolute;
+            top: 100%; left: 0;
+            width: 100%;
+            min-width: 300px; 
+            background: white;
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: none;
         }
-        @keyframes pulse-active {
-            0% { box-shadow: 0 0 20px rgba(162, 255, 0, 0.6); }
-            100% { box-shadow: 0 0 45px rgba(162, 255, 0, 1); }
+        .autocomplete-item { 
+            padding: 14px 18px; 
+            cursor: pointer; 
+            border-bottom: 1px solid var(--border); 
+            font-size: 15px;
+            color: var(--dark);
         }
-
-        .status { text-align: center; margin-top: 8px; font-style: italic; color: #666; font-size: 15px; font-weight: 500;}
-
-        /* Abas */
-        .tab-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 14px; border: none; background-color: #e9ecef; color: #495057; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        .tab-btn.ativo { background-color: var(--verde-escuro); color: white; }
-        .tab-content { display: none; }
-        .tab-content.ativo { display: block; }
+        .autocomplete-item:hover { background-color: #f0fdf4; color: var(--success); font-weight: 600; }
 
         /* Tabelas */
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left; }
-        th { background-color: var(--verde-escuro); color: white; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { background-color: var(--dark-green); color: white; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #eef2f5; }
         
-        .status-badge { padding: 6px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-        .status-em-uso { background-color: #fff3cd; color: #856404; }
-        .status-devolvido { background-color: #d4edda; color: #155724; }
+        /* Estilo do Nome Clicável */
+        .nome-clicavel {
+            color: var(--dark-green-light);
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nome-clicavel:hover {
+            color: var(--success);
+            text-decoration: underline;
+        }
+
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; text-align: center; width: 80px;}
+        .badge-pendente { background: #fff0b3; color: #b36200; border: 1px solid #ffe380; }
+        .badge-devolvido { background: #e3fcef; color: #006644; border: 1px solid #abf5d1; }
+
+        .btn-acao { border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; color: white; margin-right: 5px; transition: 0.2s; }
+        .btn-acao:hover { opacity: 0.85; }
+        .btn-editar { background: var(--info); }
+        .btn-devolver { background: var(--warning); color: #000; }
+        .btn-excluir { background: var(--danger); }
+
+        .section-title {
+            color: var(--dark-green);
+            margin: 0 0 15px 0;
+            font-size: 20px;
+            border-bottom: 2px solid var(--lime-green);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* Janela Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .btn-acao { border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 11px; margin-right: 3px; margin-bottom: 3px; color: white; }
-        .btn-ouvir { background-color: #6f42c1; } 
-        .btn-ver { background-color: #17a2b8; }
-        .btn-editar { background-color: #f0ad4e; }
-        .btn-excluir { background-color: #dc3545; }
-        .btn-pdf { background-color: var(--verde-escuro); }
-        .btn-baixa { background-color: var(--verde-oliva); color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; }
-
-        .acoes-finais { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-exportar-master { background-color: var(--verde-escuro); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; flex: 2; font-weight: bold; }
-
-        .painel-controle { display: flex; justify-content: space-between; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; }
+        .modal-header {
+            padding: 20px 25px;
+            background-color: var(--dark-green);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--lime-green);
+        }
         
-        #modalDia { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; }
-        .modal-close { float: right; cursor: pointer; font-weight: bold; font-size: 20px; color: red; }
+        /* Título Estilizado em Duas Linhas */
+        .modal-title-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .modal-subtitle-top {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--lime-green);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .modal-name-main {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.2;
+            word-break: break-word;
+        }
 
-        /* Rodapé */
-        .rodape-koda { margin-top: auto; text-align: center; padding: 20px 10px; font-size: 13px; color: #666; border-top: 1px solid #e0e0e0; }
-        .rodape-koda strong { color: var(--verde-escuro); font-size: 14px; }
+        .close-btn { color: white; font-size: 32px; font-weight: bold; cursor: pointer; transition: 0.2s; background: none; border: none; align-self: flex-start; }
+        .close-btn:hover { color: var(--lime-green); }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
 
-    <header class="main-header">
-        <h1>Gestão Flash</h1>
-        <p class="header-subtitle">Controle de saída de ferramentas manuais</p>
-        <div class="logo-accent"></div>
-    </header>
+<div class="header">
+    <h1><i class="fas fa-bolt"></i> Gestão <span>Flash</span></h1>
+    <p>Controle de Ferramentas Manuais</p>
+</div>
 
-    <div class="local-bar">
-        <span>📍 Local da Obra:</span>
-        <input type="text" id="inputCidade" placeholder="Cidade (ex: Raul Soares)" oninput="salvarLocal()">
-        <input type="text" id="inputUF" placeholder="UF" maxlength="2" style="width: 50px;" oninput="salvarLocal()">
+<div class="container">
+    
+    <div class="action-bar">
+        <button class="btn-pdf" onclick="gerarPDF()">
+            <i class="fas fa-file-pdf"></i> Baixar Planilha em PDF
+        </button>
+        <div style="flex:1; max-width: 350px;">
+            <div class="input-group">
+                <i class="fas fa-search"></i>
+                <input type="text" id="filtro-tabela" class="form-input" placeholder="Buscar no histórico geral..." onkeyup="renderizarTabela()">
+            </div>
+        </div>
     </div>
 
+    <!-- Painel de Registro Fixo -->
     <div class="card">
-        <label>Comando de Voz 🎙️</label>
-        <button id="btnGravar">Segure para Falar</button>
-        <div class="status" id="statusTexto">Ex: Acho que o Claudinei pegou uma pá e um martelo.</div>
-    </div>
+        <h2 class="section-title"><i class="fas fa-plus-circle"></i> Novo Empréstimo</h2>
+        <div class="registro-grid">
+            
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="input-funcionario" class="form-input" placeholder="Nome do Funcionário..." onkeyup="filtrarNomes()" autocomplete="off">
+                <div id="autocomplete-lista" class="autocomplete-results"></div>
+            </div>
 
-    <div class="tab-buttons">
-        <button class="tab-btn ativo" onclick="alternarAba('historico')">📋 Histórico</button>
-        <button class="tab-btn" onclick="alternarAba('funcionarios')">👤 Funcionários (<span id="totalFuncionarios">0</span>)</button>
-    </div>
+            <div class="input-group">
+                <i class="fas fa-wrench"></i>
+                <input type="text" id="input-ferramenta" class="form-input" placeholder="Ferramentas (Ex: Nível a laser...)">
+            </div>
 
-    <div id="abaHistorico" class="tab-content ativo card">
-        <div class="painel-controle">
-            <label><input type="checkbox" id="checkPendentes" onchange="aplicarFiltro()"> Ocultar Devolvidos</label>
+            <button class="btn-add" onclick="registrarFerramenta()"><i class="fas fa-check"></i> Registrar</button>
         </div>
-        <div style="overflow-x: auto;">
-            <table id="tabelaRegistros">
-                <thead><tr><th>Funcionário</th><th>Data/Hora</th><th>Ferramenta(s)</th><th>Status</th><th>Ação</th></tr></thead>
-                <tbody></tbody>
+    </div>
+
+    <!-- Histórico Unificado -->
+    <div class="card">
+        <h2 class="section-title"><i class="fas fa-history"></i> Histórico Geral</h2>
+        <p style="color: #666; font-size: 14px; margin-top: -10px; margin-bottom: 15px;">
+            <i class="fas fa-info-circle"></i> Clique no nome do funcionário para ver os detalhes individuais.
+        </p>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionário</th>
+                        <th>Ferramenta</th>
+                        <th>Data e Hora</th>
+                        <th>Responsável</th>
+                        <th>Situação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-corpo">
+                    <!-- Gerado via JavaScript -->
+                </tbody>
             </table>
         </div>
-        <div class="acoes-finais">
-            <button class="btn-exportar-master" onclick="gerarPDF(null)">📄 Gerar PDF (Geral da Obra)</button>
-        </div>
     </div>
 
-    <div id="abaFuncionarios" class="tab-content card">
-        <div style="overflow-x: auto;">
-            <table id="tabelaFuncionarios">
-                <thead><tr><th>Funcionários</th><th>Pendências Atuais</th><th>Ações do Cadastro</th></tr></thead>
-                <tbody></tbody>
-            </table>
+</div>
+
+<!-- JANELA MODAL (Histórico Individual) -->
+<div id="modal-historico" class="modal" onclick="fecharModalFora(event)">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title-box">
+                <span class="modal-subtitle-top"><i class="fas fa-history"></i> Histórico do Funcionário</span>
+                <span id="modal-nome-destaque" class="modal-name-main">Nome Completo</span>
+            </div>
+            <button class="close-btn" onclick="fecharModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="table-container">
+                <table style="margin-top: 0;">
+                    <thead>
+                        <tr>
+                            <th>Ferramenta</th>
+                            <th>Data e Hora</th>
+                            <th>Responsável</th>
+                            <th>Situação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-tabela-corpo">
+                        <!-- Gerado via JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+</div>
 
-    <div id="modalDia">
-        <div class="modal-content">
-            <span class="modal-close" onclick="fecharModal()">×</span>
-            <h3 id="tituloModal" style="margin-top:0;">Histórico do Dia</h3>
-            <ul id="listaDia" style="padding-left: 20px;"></ul>
+<!-- Elemento Oculto para o PDF -->
+<div id="area-pdf" style="display: none; padding: 40px; font-family: 'Arial', sans-serif; color: #000; background: #fff;">
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+        <div style="position: relative; display: inline-block; padding-top: 20px;">
+            <div style="position: absolute; top: 0px; left: -10%; width: 120%; height: 35px; border-top: 3px solid #7a8a29; border-radius: 50%; transform: rotate(-3deg);"></div>
+            <div style="position: absolute; top: 6px; left: -5%; width: 110%; height: 35px; border-top: 2px solid #5a661c; border-radius: 50%; transform: rotate(-2deg);"></div>
+            <div style="position: absolute; top: 12px; left: 0%; width: 100%; height: 35px; border-top: 2px solid #3c4513; border-radius: 50%; transform: rotate(-1deg);"></div>
+            
+            <h1 style="color: #004333; margin: 0; font-size: 65px; font-weight: 900; font-family: 'Arial Black', Impact, sans-serif; letter-spacing: -3px; transform: scaleX(1.15); display: inline-block; line-height: 1;">engesp</h1>
+            
+            <div style="color: #7a8a29; font-size: 16px; font-weight: normal; letter-spacing: 5px; margin-top: 2px; text-transform: lowercase;">Engenharia São Patrício</div>
         </div>
+        
+        <h3 style="margin: 30px 0 10px 0; color: #333; font-size: 20px; text-transform: uppercase; border-bottom: 2px solid #004333; padding-bottom: 10px; display: inline-block;">
+            Relatório de Controle de Ferramentas Manuais
+        </h3>
     </div>
 
-    <footer class="rodape-koda">
-        Sistema desenvolvido e protegido por <strong>Koda Studio Artes</strong> &copy; 2026
-    </footer>
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px;" border="1" cellpadding="10">
+        <thead>
+            <tr style="background-color: #004333; color: white; text-align: left;">
+                <th>Nome do Funcionário</th>
+                <th>Ferramenta(s)</th>
+                <th>Data e Hora</th>
+                <th>Responsável</th>
+                <th>Situação</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-pdf-corpo">
+            <!-- Injetado na hora do PDF -->
+        </tbody>
+    </table>
 
-    <script>
-        let funcionariosCadastrados = JSON.parse(localStorage.getItem('flash_funcionarios')) || {};
-        let historicoEmprestimos = JSON.parse(localStorage.getItem('flash_historico')) || [];
+    <div id="rodape-pdf" style="text-align: right; margin-top: 40px; font-size: 14px; color: #333; font-weight: bold; border-top: 1px solid #ccc; padding-top: 10px;">
+        <!-- Injetado via JS -->
+    </div>
+</div>
+
+<script>
+    // Lista de Funcionários
+    const funcionarios = [
+        "ADEILTON LIMA DE ALMEIDA", "ALEXANDRE ALVES DOS SANTOS", "ANTONIO RODRIGUES DE CARVALHO FILHO",
+        "BENEDITO GOMES DA SILVA", "BRUNO SILVA CORREIA", "CARLOS ROBERTO PESSOA", "CARLOS SANTOS PEREIRA",
+        "CICERO RICARDO BEZERRA", "CICERO SOARES DA SILVA", "CLAUDINEI ALVES CALISTO", "CLERIVAN JULIÃO DOS SANTOS",
+        "DAMIAO LOPES DA SILVA", "EDILAINE MORAIS DIAS", "EDIMAR APARECIDO FERREIRA LEITE", "EDUARDO HENRIQUE",
+        "ENYSON GOMES MAIA", "FERNANDO FERREIRA DE SOUZA", "FRANCISCO ADRIANO FERREIRA CONFESSOR",
+        "GEANDERSON DOS SANTOS", "GEOVANI DE SOUZA FRUTUOSO", "GUILHERME DE PAULA BAQUINI", "IVANILDO DA SILVA ARAUJO",
+        "JACQUELINE BARBOSA MATOS MENDES", "JAMESON MURIEL DE SOUZA", "JOAO BATISTA VINAGRE JUNIOR",
+        "JOAO DA SILVA RODRIGUES", "JOAQUIM PIRES RIBEIRO", "JOHN PABLO GOMES DOS SANTOS", "JOHNATA SANTA RITA REIS",
+        "JOSE GONZAGA DE ABADE", "JOSE RIBAMAR ALVES DA SILVA", "JOSE RIBAMAR LIMA LOPES", "LARISSA ALVES SOUZA",
+        "LEONARDO DA SILVA BESERRA", "LUAN CRUZ SOUZA", "LUCAS DA SILVA OLIVEIRA", "LUCAS RODRIGUES ALVES DA SILVA",
+        "LUCIANO DE ASSIS", "MAKSON RENAN SANTOS DA SILVA", "MARCIO JOSE DE JESUS SILVA", "MARCO AURELIO BRITO DA SILVA",
+        "MARCOS DE JESUS", "NAHYARAH FERNANDES DA SILVA", "NATALIA DE SOUZA PENTEADO", "PAULO MARCIO DOS SANTOS RODRIGUES",
+        "RAFAEL PEDRO DOS SANTOS", "RAUAN VITOR DE SOUZA FELIX", "SALDANE MOREIRA CABRAL", "SANTIAGO DE ARAUJO GOMES",
+        "TIAGO BERNARDO GOMES", "TIAGO FERREIRA DE MIRANDA", "VALDIVANDO SANTOS DE ALMEIDA JUNIOR", "VICTOR HUGO DE JESUS GUIMARAES"
+    ];
+
+    let bancoDados = JSON.parse(localStorage.getItem('gestaoFlashDB')) || [];
+    const RESPONSAVEL_FIXO = "Claudinei Alves";
+    let funcionarioNoModal = null; 
+
+    window.onload = () => { renderizarTabela(); };
+
+    function salvarDB() {
+        localStorage.setItem('gestaoFlashDB', JSON.stringify(bancoDados));
+        renderizarTabela();
+        if (funcionarioNoModal) renderizarModal(funcionarioNoModal);
+    }
+
+    const inputFunc = document.getElementById('input-funcionario');
+    const listaAuto = document.getElementById('autocomplete-lista');
+
+    function filtrarNomes() {
+        const termo = inputFunc.value.toLowerCase();
+        listaAuto.innerHTML = '';
         
-        document.getElementById('inputCidade').value = localStorage.getItem('flash_cidade') || "";
-        document.getElementById('inputUF').value = localStorage.getItem('flash_uf') || "";
-
-        function salvarNoBancoDeDados() {
-            localStorage.setItem('flash_funcionarios', JSON.stringify(funcionariosCadastrados));
-            localStorage.setItem('flash_historico', JSON.stringify(historicoEmprestimos));
+        if (termo.length === 0) {
+            listaAuto.style.display = 'none';
+            return;
         }
 
-        function salvarLocal() {
-            localStorage.setItem('flash_cidade', document.getElementById('inputCidade').value);
-            localStorage.setItem('flash_uf', document.getElementById('inputUF').value.toUpperCase());
-        }
-
-        function alternarAba(nomeAba) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativo'));
-            document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('ativo'));
-            if (nomeAba === 'historico') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('ativo');
-                document.getElementById('abaHistorico').classList.add('ativo');
-            } else {
-                document.querySelectorAll('.tab-btn')[1].classList.add('ativo');
-                document.getElementById('abaFuncionarios').classList.add('ativo');
-            }
-        }
-
-        const btnGravar = document.getElementById('btnGravar');
-        const statusTexto = document.getElementById('statusTexto');
-        const textoPadrao = "Ex: Acho que o Claudinei pegou uma pá e um martelo.";
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const filtrados = funcionarios.filter(f => f.toLowerCase().includes(termo));
         
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'pt-BR';
-            recognition.interimResults = false; 
-            recognition.continuous = false; 
+        if(filtrados.length === 0) {
+            listaAuto.style.display = 'none';
+            return;
+        }
 
-            let isRecording = false;
-
-            const iniciarGravacao = (e) => {
-                if(e && e.cancelable) e.preventDefault();
-                if (isRecording) return;
-                try {
-                    recognition.start();
-                    isRecording = true;
-                    btnGravar.classList.add('gravando');
-                    btnGravar.innerText = "🎙️ Ouvindo... (Solte para registrar)";
-                    statusTexto.innerText = "Pode falar...";
-                } catch(err) { console.log("Reconhecimento já em andamento."); }
+        listaAuto.style.display = 'block';
+        filtrados.forEach(nome => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-item';
+            div.innerText = nome;
+            div.onclick = () => {
+                inputFunc.value = nome;
+                listaAuto.style.display = 'none';
+                document.getElementById('input-ferramenta').focus();
             };
+            listaAuto.appendChild(div);
+        });
+    }
 
-            const pararGravacao = (e) => {
-                if(e && e.cancelable) e.preventDefault();
-                if (!isRecording) return;
-                recognition.stop(); 
-                isRecording = false;
-                btnGravar.classList.remove('gravando');
-                btnGravar.innerText = "Segure para Falar";
-                statusTexto.innerText = "Processando áudio...";
-            };
-
-            btnGravar.addEventListener('mousedown', iniciarGravacao);
-            btnGravar.addEventListener('mouseup', pararGravacao);
-            btnGravar.addEventListener('mouseleave', pararGravacao); 
-            btnGravar.addEventListener('touchstart', iniciarGravacao, {passive: false});
-            btnGravar.addEventListener('touchend', pararGravacao, {passive: false});
-            btnGravar.addEventListener('touchcancel', pararGravacao, {passive: false});
-
-            recognition.onresult = (e) => { processarAudio(e.results[0][0].transcript); };
-            
-            recognition.onerror = (e) => { 
-                btnGravar.classList.remove('gravando'); 
-                btnGravar.innerText = "Segure para Falar";
-                isRecording = false;
-                if (e.error !== 'aborted') {
-                    statusTexto.innerText = "Não entendi bem. Tente novamente.";
-                    setTimeout(() => { statusTexto.innerText = textoPadrao; }, 3000);
-                } else {
-                    statusTexto.innerText = textoPadrao;
-                }
-            };
-
-            recognition.onspeechend = () => { 
-                isRecording = false;
-                btnGravar.classList.remove('gravando'); 
-                btnGravar.innerText = "Segure para Falar";
-            };
-        } else {
-            btnGravar.innerText = "Áudio incompatível com navegador";
-            btnGravar.disabled = true;
+    document.addEventListener('click', function(e) {
+        if (e.target.id !== 'input-funcionario') {
+            listaAuto.style.display = 'none';
         }
+    });
 
-        function processarAudio(frase) {
-            frase = frase.replace(/[.,!?]/g, ' ').trim();
-            
-            // Procura a ação principal na frase
-            const regexVerbos = /\b(pegou|retirou|levou|solicitou|pega|pediu|está com|esta com)\b/i;
-            const match = frase.match(regexVerbos);
-            
-            if (!match) {
-                statusTexto.innerHTML = `Ouvi: <b>"${frase}"</b><br><span style="color:red;">Não entendi a ação (ex: pegou, levou)!</span>`;
-                setTimeout(() => { statusTexto.innerText = textoPadrao; }, 5500);
-                return;
-            }
-
-            let parteAntes = frase.substring(0, match.index).trim();
-            let parteDepois = frase.substring(match.index + match[0].length).trim();
-
-            // ============================================
-            // 1. ISOLAR APENAS O NOME DO FUNCIONÁRIO
-            // ============================================
-            let palavrasAntes = parteAntes.split(/\s+/);
-            // Lista de palavras que as pessoas falam antes do nome e que não importam
-            const lixoAntes = ['o','a','os','as','um','uma','que','ele','ela','eu','vi','disse','falei','hoje','agora','cedo','já','ja','lá','aqui','então','ai','aí','acho','acredito','falaram'];
-            
-            let palavrasNome = palavrasAntes.filter(p => !lixoAntes.includes(p.toLowerCase()));
-            let nome = palavrasNome.slice(-2).join(' '); // Pega no máximo os 2 últimos nomes (ex: João Pedro)
-            if (!nome) nome = "Desconhecido";
-            nome = capitalizar(nome);
-
-            // ============================================
-            // 2. ISOLAR AS FERRAMENTAS E CORTAR O RESTO
-            // ============================================
-            // Se a pessoa justificar ou falar local, o sistema corta fora
-            const regexCorteFim = /\b(para|pra|na|no|lá|aqui|porque|pois|logo|ali)\b/i;
-            const matchCorte = parteDepois.match(regexCorteFim);
-            if (matchCorte) {
-                parteDepois = parteDepois.substring(0, matchCorte.index).trim();
-            }
-
-            // Separa ferramentas caso tenha falado "e" ou uma vírgula
-            let listaFerramentasSujas = parteDepois.split(/\s+e\s+|,/i);
-            let ferramentasLimpas = [];
-
-            listaFerramentasSujas.forEach(f => {
-                let ferramenta = f.trim();
-                // Remove conexões no início
-                ferramenta = ferramenta.replace(/^(com a|com o|com as|com os|com|de|do|da)\b\s*/i, "").trim();
-                // Remove artigos no início
-                ferramenta = ferramenta.replace(/^(uma|um|duas|dois|três|tres|os|as|o|a)\b\s*/i, "").trim();
-                
-                if (ferramenta !== "") {
-                    ferramentasLimpas.push(capitalizar(ferramenta));
-                }
-            });
-
-            if (ferramentasLimpas.length === 0) {
-                statusTexto.innerHTML = `Ouvi: <b>"${frase}"</b><br><span style="color:red;">Não identifiquei a ferramenta!</span>`;
-                setTimeout(() => { statusTexto.innerText = textoPadrao; }, 5500);
-                return;
-            }
-
-            // ============================================
-            // 3. REGISTRAR AS FERRAMENTAS (SEPARADAMENTE)
-            // ============================================
-            const agora = new Date();
-            const dataHora = `${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR').substring(0, 5)}`;
-            const dataPura = agora.toLocaleDateString('pt-BR'); 
-
-            ferramentasLimpas.forEach(ferramenta => {
-                // Gera um ID totalmente único pra cada item
-                const idUnico = Date.now().toString() + Math.random().toString(36).substring(2, 5); 
-                
-                registrarFuncionario(nome, ferramenta);
-                historicoEmprestimos.unshift({
-                    id: idUnico, 
-                    dataHora: dataHora, 
-                    dataPura: dataPura,
-                    nome: nome, 
-                    ferramenta: ferramenta, 
-                    status: 'em uso', 
-                    horaDevolucao: null
-                });
-            });
-
-            salvarNoBancoDeDados();
-            renderizarTelas();
-            
-            // Mostra o sucesso adaptado para a quantidade
-            let txtSucesso = ferramentasLimpas.length > 1 ? `${ferramentasLimpas.length} itens registrados` : `${ferramentasLimpas[0]} registrada`;
-            statusTexto.innerText = `✅ ${txtSucesso} para ${nome}!`;
-            setTimeout(() => { statusTexto.innerText = textoPadrao; }, 4000);
-        }
-
-        function capitalizar(texto) { 
-            if (!texto) return "";
-            return texto.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); 
-        }
-
-        function registrarFuncionario(nome, ferramenta) {
-            const chave = nome.toLowerCase();
-            if (!funcionariosCadastrados[chave]) { funcionariosCadastrados[chave] = { nomeOriginal: nome, ferramentasEmUso: [] }; }
-            funcionariosCadastrados[chave].ferramentasEmUso.push(ferramenta);
-        }
-
-        function renderizarTelas() {
-            const tabHist = document.querySelector('#tabelaRegistros tbody');
-            const tabFunc = document.querySelector('#tabelaFuncionarios tbody');
-            const apenasPendentes = document.getElementById('checkPendentes').checked;
-            
-            tabHist.innerHTML = ""; tabFunc.innerHTML = "";
-
-            historicoEmprestimos.forEach(item => {
-                if (apenasPendentes && item.status === 'devolvido') return;
-                const tr = tabHist.insertRow();
-                if (item.status === 'devolvido') tr.style.color = "#aaa";
-
-                tr.insertCell(0).innerText = item.nome;
-                tr.insertCell(1).innerText = item.dataHora;
-                tr.insertCell(2).innerText = item.status === 'devolvido' ? `~~${item.ferramenta}~~` : item.ferramenta;
-                
-                tr.insertCell(3).innerHTML = item.status === 'em uso' 
-                    ? '<span class="status-badge status-em-uso">Em Uso</span>' 
-                    : `<span class="status-badge status-devolvido">Devolvido ${item.horaDevolucao}</span>`;
-                
-                tr.insertCell(4).innerHTML = item.status === 'em uso' 
-                    ? `<button class="btn-baixa" onclick="darBaixa('${item.id}', '${item.nome.toLowerCase()}', '${item.ferramenta}')">Devolver</button>` : '-';
-            });
-
-            const chaves = Object.keys(funcionariosCadastrados);
-            document.getElementById('totalFuncionarios').innerText = chaves.length;
-
-            chaves.forEach(chave => {
-                const func = funcionariosCadastrados[chave];
-                const tr = tabFunc.insertRow();
-                tr.insertCell(0).innerText = func.nomeOriginal;
-                
-                const celulaPendencia = tr.insertCell(1);
-                celulaPendencia.innerHTML = func.ferramentasEmUso.length > 0 
-                    ? `<b style="color: #d9534f;">${func.ferramentasEmUso.join(", ")}</b>` : "<span style='color: green;'>Nenhuma</span>";
-
-                const celulaAcoes = tr.insertCell(2);
-                celulaAcoes.innerHTML = `
-                    <button class="btn-acao btn-ouvir" onclick="ouvirPendencias('${chave}')">🔊 Ouvir</button>
-                    <button class="btn-acao btn-ver" onclick="verDia('${chave}')">📅 Ver Dia</button>
-                    <button class="btn-acao btn-editar" onclick="editarFuncionario('${chave}')">✏️ Editar</button>
-                    <button class="btn-acao btn-pdf" onclick="gerarPDF('${chave}')">📄 PDF</button>
-                    <button class="btn-acao btn-excluir" onclick="excluirFuncionario('${chave}')">🗑️ Excluir</button>
-                `;
-            });
-        }
-
-        function aplicarFiltro() { renderizarTelas(); }
-
-        function darBaixa(id, nomeKey, ferramenta) {
-            const item = historicoEmprestimos.find(i => i.id === id);
-            if (item) { item.status = 'devolvido'; item.horaDevolucao = new Date().toLocaleTimeString('pt-BR').substring(0, 5); }
-            if (funcionariosCadastrados[nomeKey]) {
-                const index = funcionariosCadastrados[nomeKey].ferramentasEmUso.indexOf(ferramenta);
-                if (index > -1) funcionariosCadastrados[nomeKey].ferramentasEmUso.splice(index, 1);
-            }
-            salvarNoBancoDeDados(); renderizarTelas();
-        }
+    function registrarFerramenta() {
+        const func = document.getElementById('input-funcionario').value.trim();
+        const ferra = document.getElementById('input-ferramenta').value.trim();
         
-        function ouvirPendencias(chave) {
-            if (!('speechSynthesis' in window)) { alert("Seu navegador não suporta leitura de voz."); return; }
-            const func = funcionariosCadastrados[chave];
-            let textoParaFalar = func.ferramentasEmUso.length > 0 
-                ? `O funcionário ${func.nomeOriginal} está devendo as seguintes ferramentas: ${func.ferramentasEmUso.join(", ")}.`
-                : `O funcionário ${func.nomeOriginal} não tem nenhuma pendência no momento.`;
-            
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(textoParaFalar);
-            utterance.lang = 'pt-BR'; 
-            window.speechSynthesis.speak(utterance);
+        if (func === "" || ferra === "") {
+            alert("Preencha o nome do funcionário e as ferramentas!");
+            return;
         }
 
-        function verDia(chave) {
-            const func = funcionariosCadastrados[chave];
-            const dataHoje = new Date().toLocaleDateString('pt-BR');
-            const itensDoDia = historicoEmprestimos.filter(h => h.nome.toLowerCase() === chave && h.dataPura === dataHoje);
-            
-            const ul = document.getElementById('listaDia');
-            ul.innerHTML = "";
-            document.getElementById('tituloModal').innerText = `O que ${func.nomeOriginal} pegou hoje (${dataHoje})`;
+        const dataAtual = new Date().toLocaleString('pt-BR').substring(0, 16);
 
-            if (itensDoDia.length === 0) { ul.innerHTML = "<li>Nenhuma movimentação registrada hoje.</li>"; } 
-            else {
-                itensDoDia.forEach(item => {
-                    const status = item.status === 'em uso' ? '🔴 Ainda em uso' : `🟢 Devolvido às ${item.horaDevolucao}`;
-                    ul.innerHTML += `<li><b>${item.ferramenta}</b> - ${status} (${item.dataHora.split(' ')[1]})</li>`;
-                });
-            }
-            document.getElementById('modalDia').style.display = 'flex';
+        bancoDados.unshift({
+            id: Date.now(),
+            funcionario: func,
+            ferramenta: ferra,
+            dataHora: dataAtual,
+            status: 'Pendente'
+        });
+
+        salvarDB();
+        
+        document.getElementById('input-funcionario').value = '';
+        document.getElementById('input-ferramenta').value = '';
+        document.getElementById('input-funcionario').focus();
+    }
+
+    function editarFerramenta(id) {
+        const item = bancoDados.find(i => i.id === id);
+        if (!item) return;
+
+        const novaFerramenta = prompt("Editar ferramenta(s) / quantidade:", item.ferramenta);
+        if (novaFerramenta !== null && novaFerramenta.trim() !== "") {
+            item.ferramenta = novaFerramenta.trim();
+            salvarDB();
         }
+    }
 
-        function fecharModal() { document.getElementById('modalDia').style.display = 'none'; }
-
-        function editarFuncionario(chaveAntiga) {
-            const func = funcionariosCadastrados[chaveAntiga];
-            const novoNome = prompt("Digite o novo nome para o funcionário:", func.nomeOriginal);
-            if (novoNome && novoNome.trim() !== "" && novoNome !== func.nomeOriginal) {
-                const chaveNova = novoNome.toLowerCase();
-                funcionariosCadastrados[chaveNova] = { nomeOriginal: capitalizar(novoNome), ferramentasEmUso: func.ferramentasEmUso };
-                delete funcionariosCadastrados[chaveAntiga]; 
-                historicoEmprestimos.forEach(h => { if (h.nome.toLowerCase() === chaveAntiga) h.nome = capitalizar(novoNome); });
-                salvarNoBancoDeDados(); renderizarTelas();
-            }
+    function devolverFerramenta(id) {
+        const index = bancoDados.findIndex(item => item.id === id);
+        if (index !== -1) {
+            bancoDados[index].status = 'Devolvido';
+            salvarDB();
         }
+    }
 
-        function excluirFuncionario(chave) {
-            const func = funcionariosCadastrados[chave];
-            if (confirm(`ATENÇÃO! Deseja realmente excluir o cadastro de ${func.nomeOriginal}?`)) {
-                delete funcionariosCadastrados[chave];
-                salvarNoBancoDeDados(); renderizarTelas();
+    function excluirRegistro(id) {
+        if(confirm("Tem certeza que deseja excluir este registro permanentemente?")) {
+            bancoDados = bancoDados.filter(item => item.id !== id);
+            salvarDB();
+            if(funcionarioNoModal && bancoDados.filter(i => i.funcionario === funcionarioNoModal).length === 0){
+                fecharModal();
             }
         }
+    }
 
-        function gerarPDF(chaveFuncionario) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            const cidade = document.getElementById('inputCidade').value || "Cidade não informada";
-            const uf = document.getElementById('inputUF').value || "UF";
-            const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            const hoje = new Date();
-            const dataExtenso = `${cidade} - ${uf}, ${hoje.getDate()} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+    function renderizarTabela() {
+        const filtro = document.getElementById('filtro-tabela').value.toLowerCase();
+        const tbody = document.getElementById('tabela-corpo');
+        tbody.innerHTML = '';
 
-            let tituloRelatorio = "Relatório Geral de Ferramentas";
-            let dadosTabela = [];
-
-            doc.setLineWidth(0.6);
-            doc.setDrawColor(140, 153, 51);
-            doc.line(14, 8, 55, 12); doc.line(14, 11, 58, 14); doc.line(14, 14, 62, 16);
-
-            doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(0, 71, 59); doc.text("engesp", 14, 23);
-            doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(140, 153, 51); doc.text("Engenharia São Patrício", 14.5, 27);
-            doc.setFont("helvetica", "bold"); doc.setTextColor(0, 71, 59); doc.setFontSize(15); doc.text("SISTEMA DE GESTÃO FLASH", 196, 15, { align: "right" });
-            
-            if (chaveFuncionario && funcionariosCadastrados[chaveFuncionario]) {
-                const nome = funcionariosCadastrados[chaveFuncionario].nomeOriginal;
-                tituloRelatorio = `Ficha do Funcionário: ${nome}`;
-                const historicoDele = historicoEmprestimos.filter(h => h.nome.toLowerCase() === chaveFuncionario);
-                dadosTabela = historicoDele.map(h => [ h.dataHora, h.ferramenta, h.status === 'em uso' ? 'PENDENTE' : 'Devolvido' ]);
-                
-                doc.setFontSize(11); doc.setTextColor(100, 100, 100); doc.text(tituloRelatorio, 196, 22, { align: "right" });
-                doc.setDrawColor(140, 153, 51); doc.setLineWidth(0.4); doc.line(14, 32, 196, 32);
-
-                doc.autoTable({ startY: 37, head: [['Data / Hora', 'Ferramenta', 'Situação Atual']], body: dadosTabela, headStyles: { fillColor: [0, 71, 59] }, styles: { fontSize: 10, cellPadding: 4 }, alternateRowStyles: { fillColor: [245, 245, 245] } });
-            } else {
-                doc.setFontSize(11); doc.setTextColor(100, 100, 100); doc.text("Relatório Geral de Obras", 196, 22, { align: "right" });
-                doc.setDrawColor(140, 153, 51); doc.setLineWidth(0.4); doc.line(14, 32, 196, 32);
-                
-                const mostrarApenasPendentes = document.getElementById('checkPendentes').checked;
-                historicoEmprestimos.forEach(h => {
-                    if (mostrarApenasPendentes && h.status === 'devolvido') return;
-                    dadosTabela.push([ h.nome, h.dataHora, h.ferramenta, h.status === 'em uso' ? 'PENDENTE' : 'Devolvido' ]);
-                });
-
-                doc.autoTable({ startY: 37, head: [['Funcionário', 'Data / Hora', 'Ferramenta', 'Situação']], body: dadosTabela, headStyles: { fillColor: [0, 71, 59] }, styles: { fontSize: 10, cellPadding: 4 }, alternateRowStyles: { fillColor: [245, 245, 245] } });
-            }
-
-            let alturaFinal = doc.lastAutoTable.finalY + 35; 
-            if (alturaFinal > 260) { doc.addPage(); alturaFinal = 35; }
-
-            doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(50, 50, 50);
-            doc.text("____________________________________________________", 105, alturaFinal, { align: "center" });
-            doc.text("Visto do Responsável / Almoxarifado", 105, alturaFinal + 6, { align: "center" });
-            doc.text(dataExtenso, 105, alturaFinal + 20, { align: "center" }); 
-            
-            doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.text("Gerado por Gestão Flash | Koda Studio Artes", 105, 290, { align: "center" }); 
-
-            const nomeArquivo = chaveFuncionario ? `Relatorio_${chaveFuncionario}_${new Date().getTime()}.pdf` : 'Relatorio_Geral_Engesp.pdf';
-            doc.save(nomeArquivo);
+        let dadosFiltrados = bancoDados;
+        if (filtro) {
+            dadosFiltrados = bancoDados.filter(i => 
+                i.funcionario.toLowerCase().includes(filtro) || 
+                i.ferramenta.toLowerCase().includes(filtro) ||
+                i.status.toLowerCase().includes(filtro)
+            );
         }
 
-        window.onload = renderizarTelas;
-    </script>
+        if (dadosFiltrados.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 30px; color: #666;">Nenhum registro encontrado.</td></tr>`;
+            return;
+        }
+
+        dadosFiltrados.forEach(item => {
+            const tr = document.createElement('tr');
+            
+            const badgeClass = item.status === 'Pendente' ? 'badge-pendente' : 'badge-devolvido';
+            const statusVisual = `<span class="badge ${badgeClass}">${item.status}</span>`;
+            
+            let botoesAcao = '';
+            botoesAcao += `<button class="btn-acao btn-editar" onclick="editarFerramenta(${item.id})" title="Editar ferramenta"><i class="fas fa-edit"></i></button>`;
+            if (item.status === 'Pendente') {
+                botoesAcao += `<button class="btn-acao btn-devolver" onclick="devolverFerramenta(${item.id})" title="Marcar como devolvido"><i class="fas fa-undo"></i></button>`;
+            }
+            botoesAcao += `<button class="btn-acao btn-excluir" onclick="excluirRegistro(${item.id})" title="Apagar Registro"><i class="fas fa-trash"></i></button>`;
+
+            tr.innerHTML = `
+                <td>
+                    <span class="nome-clicavel" onclick="abrirModal('${item.funcionario}')" title="Ver histórico deste funcionário">
+                        <i class="fas fa-link"></i> ${item.funcionario}
+                    </span>
+                </td>
+                <td>${item.ferramenta}</td>
+                <td>${item.dataHora}</td>
+                <td>${RESPONSAVEL_FIXO}</td>
+                <td>${statusVisual}</td>
+                <td>${botoesAcao}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function abrirModal(nome) {
+        funcionarioNoModal = nome;
+        document.getElementById('modal-nome-destaque').innerText = nome;
+        document.getElementById('modal-historico').style.display = 'flex';
+        renderizarModal(nome);
+    }
+
+    function fecharModal() {
+        document.getElementById('modal-historico').style.display = 'none';
+        funcionarioNoModal = null;
+    }
+
+    function fecharModalFora(event) {
+        if (event.target.id === 'modal-historico') {
+            fecharModal();
+        }
+    }
+
+    function renderizarModal(nome) {
+        const tbodyModal = document.getElementById('modal-tabela-corpo');
+        tbodyModal.innerHTML = '';
+        
+        const registros = bancoDados.filter(i => i.funcionario === nome);
+        
+        registros.forEach(item => {
+            const tr = document.createElement('tr');
+            const badgeClass = item.status === 'Pendente' ? 'badge-pendente' : 'badge-devolvido';
+            const statusVisual = `<span class="badge ${badgeClass}">${item.status}</span>`;
+            
+            let botoesAcao = '';
+            botoesAcao += `<button class="btn-acao btn-editar" onclick="editarFerramenta(${item.id})" title="Editar"><i class="fas fa-edit"></i> Editar</button>`;
+            if (item.status === 'Pendente') {
+                botoesAcao += `<button class="btn-acao btn-devolver" onclick="devolverFerramenta(${item.id})" title="Marcar como devolvido"><i class="fas fa-undo"></i> Devolver</button>`;
+            }
+            botoesAcao += `<button class="btn-acao btn-excluir" onclick="excluirRegistro(${item.id})" title="Excluir"><i class="fas fa-trash"></i></button>`;
+
+            tr.innerHTML = `
+                <td><strong>${item.ferramenta}</strong></td>
+                <td>${item.dataHora}</td>
+                <td>${RESPONSAVEL_FIXO}</td>
+                <td>${statusVisual}</td>
+                <td>${botoesAcao}</td>
+            `;
+            tbodyModal.appendChild(tr);
+        });
+    }
+
+    function gerarPDF() {
+        if(bancoDados.length === 0) {
+            alert("Não há dados para gerar o relatório.");
+            return;
+        }
+
+        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        const dataHoje = new Date();
+        const diaAtual = String(dataHoje.getDate()).padStart(2, '0');
+        const mesAtual = meses[dataHoje.getMonth()];
+        const anoAtual = dataHoje.getFullYear();
+        
+        document.getElementById('rodape-pdf').innerText = `Raul Soares MG, ${diaAtual} de ${mesAtual} de ${anoAtual}.`;
+
+        const corpoPdf = document.getElementById('tabela-pdf-corpo');
+        corpoPdf.innerHTML = '';
+
+        bancoDados.forEach(item => {
+            const tr = document.createElement('tr');
+            let colorSit = item.status === 'Pendente' ? 'color: #de350b; font-weight: bold;' : 'color: #00875a; font-weight: bold;';
+            
+            tr.innerHTML = `
+                <td><strong>${item.funcionario}</strong></td>
+                <td>${item.ferramenta}</td>
+                <td>${item.dataHora}</td>
+                <td>${RESPONSAVEL_FIXO}</td>
+                <td style="${colorSit}">${item.status}</td>
+            `;
+            corpoPdf.appendChild(tr);
+        });
+
+        const elemento = document.getElementById('area-pdf');
+        elemento.style.display = 'block'; 
+
+        const config = {
+            margin:       15,
+            filename:     'Engesp_Relatorio_Ferramentas.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+
+        html2pdf().set(config).from(elemento).save().then(() => {
+            elemento.style.display = 'none';
+        });
+    }
+</script>
+
 </body>
 </html>
