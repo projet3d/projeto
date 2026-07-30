@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão Flash - Controle de Ferramentas Manuais</title>
+    <title>Engesp Tools - Controle de Ferramentas</title>
     <!-- Fonte e Ícones -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,7 +12,6 @@
     
     <style>
         :root {
-            /* Paleta de Cores baseada na logo da Engesp */
             --dark-green: #004333;
             --dark-green-light: #005a45;
             --lime-green: #7a8a29;
@@ -35,311 +34,267 @@
             padding: 0;
         }
 
-        /* Cabeçalho */
+        /* Cabeçalho Compacto (AJUSTADO) */
         .header {
             background-color: var(--dark-green);
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 5px solid var(--lime-green);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            padding: 8px 20px; /* Reduzido para ocupar menos espaço */
+            border-bottom: 3px solid var(--lime-green);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .header h1 {
+        
+        /* Logo Engesp */
+        .logo-engesp-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 130px; /* Logo menor */
+        }
+        .logo-swooshes {
+            width: 100%;
+            height: auto;
+            margin-bottom: -3px;
+        }
+        .logo-titulo {
             color: #ffffff;
             margin: 0;
-            font-size: 32px;
+            font-size: 26px; /* Fonte menor */
+            font-weight: 900;
+            font-family: 'Arial Black', sans-serif;
+            letter-spacing: -1.5px;
+            line-height: 0.9;
+            text-align: center;
+        }
+        .logo-subtitulo {
+            color: var(--lime-green);
+            font-size: 7px; /* Subtítulo menor */
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-top: 2px;
+        }
+        
+        .header-system-name {
+            color: #e3fcef;
+            font-size: 14px; /* Texto menor */
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .header h1 span { color: var(--lime-green); }
-        .header p {
-            color: #e0f2e5;
-            margin: 10px 0 0 0;
-            font-size: 18px;
-            font-weight: 500;
+            border-left: 2px solid rgba(255,255,255,0.2);
+            padding-left: 15px;
         }
 
         /* Container Principal */
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
+        .container { max-width: 1200px; margin: 15px auto; padding: 0 15px; }
         .card {
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-            border: 1px solid var(--border);
+            background: var(--bg-card); border-radius: 8px; padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; border: 1px solid var(--border);
         }
 
-        /* Barra de Ações (PDF) */
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .btn-pdf {
-            background: var(--dark-green);
-            color: white;
-            border: 2px solid var(--dark-green);
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: 0.3s;
-        }
-        .btn-pdf:hover {
-            background: var(--dark-green-light);
-            border-color: var(--dark-green-light);
-        }
-
-        /* Registro Rápido */
-        .registro-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 20px;
-            position: relative;
-        }
-        
-        @media (max-width: 768px) {
-            .registro-grid { grid-template-columns: 1fr; } 
+        /* Top Bar */
+        .top-bar {
+            display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between;
+            background: white; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;
         }
         
         .input-group { position: relative; width: 100%; }
         .input-group i { position: absolute; left: 15px; top: 16px; color: #8a94a5; }
         .form-input {
-            width: 100%;
-            padding: 14px 14px 14px 40px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 16px; 
-            box-sizing: border-box;
-            outline: none;
+            width: 100%; padding: 14px 14px 14px 40px; border: 1px solid var(--border);
+            border-radius: 6px; font-size: 15px; box-sizing: border-box; outline: none;
         }
         .form-input:focus { border-color: var(--dark-green-light); box-shadow: 0 0 0 3px rgba(0, 67, 51, 0.1); }
-        
+
+        .btn-pdf {
+            color: white; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 600;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; transition: 0.3s;
+        }
+        .btn-pdf-all { background: var(--dark-green); }
+        .btn-pdf-pend { background: #b36200; }
+        .btn-pdf-dev { background: var(--success); }
+        .btn-pdf:hover { opacity: 0.85; }
+
+        /* Registro Flex */
+        .acoes-registro {
+            display: flex; gap: 15px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;
+        }
         .btn-add {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 0 35px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-            height: 50px;
+            background: var(--success); color: white; border: none; padding: 0 30px;
+            border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; height: 50px;
+            display: flex; align-items: center; gap: 8px;
         }
         .btn-add:hover { background: #006644; }
 
-        /* Autocomplete Limpo */
+        .btn-voz {
+            background: var(--info); color: white; border: none; padding: 0 25px;
+            border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; height: 50px;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s;
+        }
+        .btn-voz:hover { opacity: 0.85; }
+        .btn-voz.ouvindo {
+            background: var(--danger);
+            animation: piscar 1s infinite;
+        }
+        @keyframes piscar {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .registro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; flex: 1; }
+        
+        @media (max-width: 768px) {
+            .registro-grid { grid-template-columns: 1fr; }
+            .acoes-registro { flex-direction: column; align-items: stretch; }
+            .header { flex-direction: column; text-align: center; gap: 5px; padding: 10px; }
+            .header-system-name { border-left: none; border-top: 1px solid rgba(255,255,255,0.2); padding-left: 0; padding-top: 8px; width: 100%; font-size: 12px; }
+        }
+
+        /* Autocomplete */
         .autocomplete-results {
-            position: absolute;
-            top: 100%; left: 0;
-            width: 100%;
-            min-width: 300px; 
-            background: white;
-            border: 1px solid var(--border);
-            border-top: none;
-            border-radius: 0 0 6px 6px;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            display: none;
+            position: absolute; top: 100%; left: 0; width: 100%; background: white;
+            border: 1px solid var(--border); border-top: none; border-radius: 0 0 6px 6px;
+            max-height: 250px; overflow-y: auto; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: none;
         }
-        .autocomplete-item { 
-            padding: 14px 18px; 
-            cursor: pointer; 
-            border-bottom: 1px solid var(--border); 
-            font-size: 15px;
-            color: var(--dark);
-        }
+        .autocomplete-item { padding: 12px 18px; cursor: pointer; border-bottom: 1px solid #f4f6f8; font-size: 14px; }
         .autocomplete-item:hover { background-color: #f0fdf4; color: var(--success); font-weight: 600; }
 
         /* Tabelas */
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 14px; }
         th { background-color: var(--dark-green); color: white; font-weight: 600; }
         tr:nth-child(even) { background-color: #f8f9fa; }
         tr:hover { background-color: #eef2f5; }
         
-        /* Estilo do Nome Clicável */
-        .nome-clicavel {
-            color: var(--dark-green-light);
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .nome-clicavel:hover {
-            color: var(--success);
-            text-decoration: underline;
-        }
-
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; text-align: center; width: 80px;}
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; text-align: center; }
         .badge-pendente { background: #fff0b3; color: #b36200; border: 1px solid #ffe380; }
         .badge-devolvido { background: #e3fcef; color: #006644; border: 1px solid #abf5d1; }
 
-        .btn-acao { border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; color: white; margin-right: 5px; transition: 0.2s; }
+        .btn-acao { border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; color: white; margin-right: 5px; }
         .btn-acao:hover { opacity: 0.85; }
         .btn-editar { background: var(--info); }
         .btn-devolver { background: var(--warning); color: #000; }
         .btn-excluir { background: var(--danger); }
+        .btn-abrir { background: var(--dark-green-light); }
 
         .section-title {
-            color: var(--dark-green);
-            margin: 0 0 15px 0;
-            font-size: 20px;
-            border-bottom: 2px solid var(--lime-green);
-            padding-bottom: 10px;
-            display: inline-block;
+            color: var(--dark-green); margin: 0 0 15px 0; font-size: 18px;
+            border-bottom: 2px solid var(--lime-green); padding-bottom: 10px; display: inline-block;
         }
 
         /* Janela Modal */
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(3px);
+            display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px);
         }
         .modal-content {
-            background-color: white;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 900px;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            background-color: white; border-radius: 10px; width: 90%; max-width: 900px;
+            max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.3);
             animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        
         .modal-header {
-            padding: 20px 25px;
-            background-color: var(--dark-green);
-            color: white;
-            border-radius: 10px 10px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 4px solid var(--lime-green);
+            padding: 15px 20px; background-color: var(--dark-green); color: white; border-radius: 10px 10px 0 0;
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--lime-green);
         }
-        
-        /* Título Estilizado em Duas Linhas */
-        .modal-title-box {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .modal-subtitle-top {
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--lime-green);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .modal-name-main {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-            line-height: 1.2;
-            word-break: break-word;
-        }
-
-        .close-btn { color: white; font-size: 32px; font-weight: bold; cursor: pointer; transition: 0.2s; background: none; border: none; align-self: flex-start; }
+        .close-btn { color: white; font-size: 32px; font-weight: bold; cursor: pointer; background: none; border: none; }
         .close-btn:hover { color: var(--lime-green); }
-        .modal-body {
-            padding: 20px;
-            overflow-y: auto;
+        .modal-body { padding: 20px; overflow-y: auto; }
+        
+        /* Rodapé */
+        .footer-creditos {
+            text-align: center; padding: 20px; margin-top: 10px; color: #8a94a5; font-size: 13px;
         }
+        .footer-creditos strong { color: var(--dark-green); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1><i class="fas fa-bolt"></i> Gestão <span>Flash</span></h1>
-    <p>Controle de Ferramentas Manuais</p>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <!-- Logo Engesp no Cabeçalho -->
+        <div class="logo-engesp-container">
+            <img class="logo-swooshes" src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 45' width='220' height='45'%3E%3Cpath d='M 10 38 C 60 48, 130 42, 185 24' stroke='%237a8a29' stroke-width='4.5' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 22 29 C 70 39, 140 33, 198 14' stroke='%237a8a29' stroke-width='2.8' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 35 20 C 80 30, 150 24, 212 4' stroke='%237a8a29' stroke-width='1.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E" alt="Engesp Riscas">
+            <h1 class="logo-titulo">engesp</h1>
+            <div class="logo-subtitulo">Engenharia São Patrício</div>
+        </div>
+    </div>
+    <div class="header-system-name">Engesp Tools - Controle de Ferramentas</div>
 </div>
 
 <div class="container">
     
-    <div class="action-bar">
-        <button class="btn-pdf" onclick="gerarPDF()">
-            <i class="fas fa-file-pdf"></i> Baixar Planilha em PDF
-        </button>
-        <div style="flex:1; max-width: 350px;">
+    <!-- Barra de Controles Globais -->
+    <div class="top-bar">
+        <div style="flex: 1; min-width: 200px;">
+            <label style="font-size: 12px; font-weight: 600; color: #666;">Sua Localização (Para o PDF)</label>
             <div class="input-group">
-                <i class="fas fa-search"></i>
-                <input type="text" id="filtro-tabela" class="form-input" placeholder="Buscar no histórico geral..." onkeyup="renderizarTabela()">
+                <i class="fas fa-map-marker-alt"></i>
+                <input type="text" id="input-local" class="form-input" placeholder="Ex: Ipatinga - MG">
             </div>
+        </div>
+        <div style="flex: 1; min-width: 180px;">
+            <label style="font-size: 12px; font-weight: 600; color: #666;">Filtrar por Data</label>
+            <div class="input-group">
+                <i class="fas fa-calendar-alt"></i>
+                <input type="date" id="filtro-data" class="form-input" onchange="renderizarTabela()">
+            </div>
+        </div>
+        <div style="flex: 2; min-width: 250px; display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-pdf btn-pdf-all" onclick="gerarPDF('Todos')"><i class="fas fa-file-pdf"></i> Geral</button>
+            <button class="btn-pdf btn-pdf-pend" onclick="gerarPDF('Pendentes')"><i class="fas fa-exclamation-circle"></i> Pendentes</button>
+            <button class="btn-pdf btn-pdf-dev" onclick="gerarPDF('Devolvidos')"><i class="fas fa-check-circle"></i> Devolvidos</button>
         </div>
     </div>
 
-    <!-- Painel de Registro Fixo -->
+    <!-- Painel de Registros -->
     <div class="card">
         <h2 class="section-title"><i class="fas fa-plus-circle"></i> Novo Empréstimo</h2>
-        <div class="registro-grid">
+        
+        <div class="acoes-registro">
+            <div class="registro-grid">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="input-funcionario" class="form-input" placeholder="Buscar Funcionário..." oninput="filtrarNomes()" onfocus="filtrarNomes()" autocomplete="off">
+                    <div id="autocomplete-lista" class="autocomplete-results"></div>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-wrench"></i>
+                    <input type="text" id="input-ferramenta" class="form-input" placeholder="Qual ferramenta ele/ela, pegou?">
+                </div>
+            </div>
             
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" id="input-funcionario" class="form-input" placeholder="Nome do Funcionário..." onkeyup="filtrarNomes()" autocomplete="off">
-                <div id="autocomplete-lista" class="autocomplete-results"></div>
-            </div>
-
-            <div class="input-group">
-                <i class="fas fa-wrench"></i>
-                <input type="text" id="input-ferramenta" class="form-input" placeholder="Ferramentas (Ex: Nível a laser...)">
-            </div>
-
-            <button class="btn-add" onclick="registrarFerramenta()"><i class="fas fa-check"></i> Registrar</button>
+            <!-- Botões de Ação -->
+            <button type="button" class="btn-add" onclick="registrarFerramenta()"><i class="fas fa-check"></i> Registrar</button>
+            <button type="button" id="btn-voz" class="btn-voz" onclick="iniciarReconhecimentoVoz()" title="Fale: '[Nome] pegou [Ferramenta]'">
+                <i class="fas fa-microphone"></i> Por Voz
+            </button>
         </div>
     </div>
 
-    <!-- Histórico Unificado -->
+    <!-- Tabela Agrupada -->
     <div class="card">
-        <h2 class="section-title"><i class="fas fa-history"></i> Histórico Geral</h2>
-        <p style="color: #666; font-size: 14px; margin-top: -10px; margin-bottom: 15px;">
-            <i class="fas fa-info-circle"></i> Clique no nome do funcionário para ver os detalhes individuais.
-        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+            <h2 class="section-title" style="margin: 0;"><i class="fas fa-users"></i> Equipe no Dia Selecionado</h2>
+            <div class="input-group" style="width: 300px; margin-top: 10px;">
+                <i class="fas fa-search"></i>
+                <input type="text" id="filtro-nome" class="form-input" placeholder="Buscar funcionário..." onkeyup="renderizarTabela()">
+            </div>
+        </div>
+        
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Funcionário</th>
-                        <th>Ferramenta</th>
-                        <th>Data e Hora</th>
-                        <th>Responsável</th>
-                        <th>Situação</th>
+                        <th>Funcionário (Ordem Alfabética)</th>
+                        <th>Ferramentas Pegas</th>
+                        <th>Situação do Dia</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -350,17 +305,21 @@
         </div>
     </div>
 
+    <div class="footer-creditos">
+        Sistema Desenvolvido por <strong>Koda Studio Artes</strong> &copy; 2026. Todos os direitos reservados.
+    </div>
+
 </div>
 
 <!-- JANELA MODAL (Histórico Individual) -->
 <div id="modal-historico" class="modal" onclick="fecharModalFora(event)">
     <div class="modal-content">
         <div class="modal-header">
-            <div class="modal-title-box">
-                <span class="modal-subtitle-top"><i class="fas fa-history"></i> Histórico do Funcionário</span>
-                <span id="modal-nome-destaque" class="modal-name-main">Nome Completo</span>
+            <div>
+                <span style="font-size: 12px; color: var(--lime-green); font-weight: bold; text-transform: uppercase;">Ferramentas de</span>
+                <h3 id="modal-nome-destaque" style="margin: 0; font-size: 20px;">Nome</h3>
             </div>
-            <button class="close-btn" onclick="fecharModal()">&times;</button>
+            <button type="button" class="close-btn" onclick="fecharModal()">&times;</button>
         </div>
         <div class="modal-body">
             <div class="table-container">
@@ -368,8 +327,7 @@
                     <thead>
                         <tr>
                             <th>Ferramenta</th>
-                            <th>Data e Hora</th>
-                            <th>Responsável</th>
+                            <th>Hora</th>
                             <th>Situação</th>
                             <th>Ações</th>
                         </tr>
@@ -383,47 +341,43 @@
     </div>
 </div>
 
-<!-- Elemento Oculto para o PDF -->
+<!-- Área Oculta Impressa no PDF -->
 <div id="area-pdf" style="display: none; padding: 40px; font-family: 'Arial', sans-serif; color: #000; background: #fff;">
-    
-    <div style="text-align: center; margin-bottom: 30px;">
-        <div style="position: relative; display: inline-block; padding-top: 20px;">
-            <div style="position: absolute; top: 0px; left: -10%; width: 120%; height: 35px; border-top: 3px solid #7a8a29; border-radius: 50%; transform: rotate(-3deg);"></div>
-            <div style="position: absolute; top: 6px; left: -5%; width: 110%; height: 35px; border-top: 2px solid #5a661c; border-radius: 50%; transform: rotate(-2deg);"></div>
-            <div style="position: absolute; top: 12px; left: 0%; width: 100%; height: 35px; border-top: 2px solid #3c4513; border-radius: 50%; transform: rotate(-1deg);"></div>
-            
-            <h1 style="color: #004333; margin: 0; font-size: 65px; font-weight: 900; font-family: 'Arial Black', Impact, sans-serif; letter-spacing: -3px; transform: scaleX(1.15); display: inline-block; line-height: 1;">engesp</h1>
-            
-            <div style="color: #7a8a29; font-size: 16px; font-weight: normal; letter-spacing: 5px; margin-top: 2px; text-transform: lowercase;">Engenharia São Patrício</div>
+    <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #004333; padding-bottom: 20px;">
+        <div style="display: flex; flex-direction: column; align-items: center; margin-right: 40px; width: 220px;">
+            <!-- Imagem com as riscas idênticas para renderizar perfeitamente no PDF -->
+            <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 45' width='220' height='45'%3E%3Cpath d='M 10 38 C 60 48, 130 42, 185 24' stroke='%237a8a29' stroke-width='4.5' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 22 29 C 70 39, 140 33, 198 14' stroke='%237a8a29' stroke-width='2.8' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 35 20 C 80 30, 150 24, 212 4' stroke='%237a8a29' stroke-width='1.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E" style="width: 100%; height: auto; margin-bottom: -5px;" alt="Engesp Riscas">
+            <h1 style="color: #004333; margin: 0; font-size: 55px; font-weight: 900; font-family: 'Arial Black', sans-serif; letter-spacing: -2px; line-height: 0.9; text-align: center;">engesp</h1>
+            <div style="color: #7a8a29; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; text-align: center; margin-top: 4px;">Engenharia São Patrício</div>
         </div>
-        
-        <h3 style="margin: 30px 0 10px 0; color: #333; font-size: 20px; text-transform: uppercase; border-bottom: 2px solid #004333; padding-bottom: 10px; display: inline-block;">
-            Relatório de Controle de Ferramentas Manuais
-        </h3>
+        <div style="flex: 1; text-align: left; border-left: 2px solid #ccc; padding-left: 30px;">
+            <h2 style="margin: 0; font-size: 24px; color: #004333; text-transform: uppercase;">Relatório - Engesp Tools</h2>
+            <p id="pdf-subtitulo" style="margin: 8px 0 0 0; font-size: 16px; color: #555; font-weight: bold;">Filtro: Todos</p>
+            <p id="pdf-data-filtro" style="margin: 5px 0 0 0; font-size: 14px; color: #555;">Data Referência: --/--/----</p>
+        </div>
     </div>
 
-    <table style="width: 100%; border-collapse: collapse; font-size: 13px;" border="1" cellpadding="10">
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px;" border="1" cellpadding="8">
         <thead>
             <tr style="background-color: #004333; color: white; text-align: left;">
                 <th>Nome do Funcionário</th>
                 <th>Ferramenta(s)</th>
                 <th>Data e Hora</th>
-                <th>Responsável</th>
                 <th>Situação</th>
             </tr>
         </thead>
         <tbody id="tabela-pdf-corpo">
-            <!-- Injetado na hora do PDF -->
+            <!-- Injetado via JS -->
         </tbody>
     </table>
 
-    <div id="rodape-pdf" style="text-align: right; margin-top: 40px; font-size: 14px; color: #333; font-weight: bold; border-top: 1px solid #ccc; padding-top: 10px;">
-        <!-- Injetado via JS -->
+    <div style="text-align: right; margin-top: 40px; font-size: 14px; border-top: 1px solid #ccc; padding-top: 15px;">
+        <div id="rodape-pdf" style="font-weight: bold; color: #333; margin-bottom: 5px;"></div>
+        <div style="font-size: 11px; color: #888;">Sistema Desenvolvido por <strong>Koda Studio Artes</strong> &copy;</div>
     </div>
 </div>
 
 <script>
-    // Lista de Funcionários
     const funcionarios = [
         "ADEILTON LIMA DE ALMEIDA", "ALEXANDRE ALVES DOS SANTOS", "ANTONIO RODRIGUES DE CARVALHO FILHO",
         "BENEDITO GOMES DA SILVA", "BRUNO SILVA CORREIA", "CARLOS ROBERTO PESSOA", "CARLOS SANTOS PEREIRA",
@@ -441,11 +395,40 @@
         "TIAGO BERNARDO GOMES", "TIAGO FERREIRA DE MIRANDA", "VALDIVANDO SANTOS DE ALMEIDA JUNIOR", "VICTOR HUGO DE JESUS GUIMARAES"
     ];
 
-    let bancoDados = JSON.parse(localStorage.getItem('gestaoFlashDB')) || [];
-    const RESPONSAVEL_FIXO = "Claudinei Alves";
+    let bancoDados = [];
+    try {
+        const dadosLocais = localStorage.getItem('gestaoFlashDB');
+        bancoDados = dadosLocais ? JSON.parse(dadosLocais) : [];
+        if (!Array.isArray(bancoDados)) bancoDados = [];
+    } catch (e) { bancoDados = []; }
+
     let funcionarioNoModal = null; 
 
-    window.onload = () => { renderizarTabela(); };
+    window.onload = () => { 
+        document.getElementById('input-local').value = localStorage.getItem('gestaoLocal') || '';
+        const hoje = new Date();
+        const yyyy = hoje.getFullYear();
+        const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoje.getDate()).padStart(2, '0');
+        document.getElementById('filtro-data').value = `${yyyy}-${mm}-${dd}`;
+        renderizarTabela(); 
+    };
+
+    document.getElementById('input-local').addEventListener('input', function(e) {
+        localStorage.setItem('gestaoLocal', e.target.value);
+    });
+
+    function escaparHTML(texto) {
+        const div = document.createElement('div');
+        div.innerText = texto;
+        return div.innerHTML;
+    }
+
+    function formatarDataBR(dataIso) {
+        if(!dataIso) return "";
+        const p = dataIso.split('-');
+        return `${p[2]}/${p[1]}/${p[0]}`;
+    }
 
     function salvarDB() {
         localStorage.setItem('gestaoFlashDB', JSON.stringify(bancoDados));
@@ -454,220 +437,354 @@
     }
 
     const inputFunc = document.getElementById('input-funcionario');
+    const inputFerra = document.getElementById('input-ferramenta');
     const listaAuto = document.getElementById('autocomplete-lista');
 
+    inputFerra.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') registrarFerramenta();
+    });
+
+    // --- AUTOCOMPLETE ---
     function filtrarNomes() {
         const termo = inputFunc.value.toLowerCase();
         listaAuto.innerHTML = '';
         
-        if (termo.length === 0) {
-            listaAuto.style.display = 'none';
-            return;
+        let filtrados = funcionarios;
+        if (termo.length > 0) {
+            filtrados = funcionarios.filter(f => f.toLowerCase().includes(termo));
         }
-
-        const filtrados = funcionarios.filter(f => f.toLowerCase().includes(termo));
         
-        if(filtrados.length === 0) {
-            listaAuto.style.display = 'none';
-            return;
-        }
+        if(filtrados.length === 0) { listaAuto.style.display = 'none'; return; }
 
         listaAuto.style.display = 'block';
         filtrados.forEach(nome => {
             const div = document.createElement('div');
             div.className = 'autocomplete-item';
-            div.innerText = nome;
+            
+            if(termo.length > 0) {
+                const regex = new RegExp(`(${termo})`, "gi");
+                div.innerHTML = nome.replace(regex, "<strong>$1</strong>");
+            } else {
+                div.innerText = nome;
+            }
+
             div.onclick = () => {
                 inputFunc.value = nome;
                 listaAuto.style.display = 'none';
-                document.getElementById('input-ferramenta').focus();
+                inputFerra.focus();
             };
             listaAuto.appendChild(div);
         });
     }
 
     document.addEventListener('click', function(e) {
-        if (e.target.id !== 'input-funcionario') {
+        if (e.target.id !== 'input-funcionario' && e.target.className !== 'autocomplete-item') {
             listaAuto.style.display = 'none';
         }
     });
 
     function registrarFerramenta() {
-        const func = document.getElementById('input-funcionario').value.trim();
-        const ferra = document.getElementById('input-ferramenta').value.trim();
+        const func = inputFunc.value.trim();
+        const ferra = inputFerra.value.trim();
+        if (func === "" || ferra === "") { alert("Preencha funcionário e ferramenta!"); return; }
+        inserirNoBanco(func, ferra);
+        inputFunc.value = ''; inputFerra.value = ''; inputFunc.focus();
+    }
+
+    // --- RECONHECIMENTO DE VOZ ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = function() {
+            const btn = document.getElementById('btn-voz');
+            btn.innerHTML = '<i class="fas fa-microphone-slash"></i> Ouvindo...';
+            btn.classList.add('ouvindo');
+        };
+
+        recognition.onresult = function(event) {
+            const fala = event.results[0][0].transcript;
+            processarComandoDeVoz(fala);
+        };
+
+        recognition.onend = function() { resetarBotaoVoz(); };
+        recognition.onerror = function(event) {
+            alert('Erro no microfone: ' + event.error);
+            resetarBotaoVoz();
+        };
+    }
+
+    function resetarBotaoVoz() {
+        const btn = document.getElementById('btn-voz');
+        btn.innerHTML = '<i class="fas fa-microphone"></i> Por Voz';
+        btn.classList.remove('ouvindo');
+    }
+
+    function iniciarReconhecimentoVoz() {
+        if (recognition) {
+            try { recognition.start(); } catch(e) {}
+        } else {
+            alert("Seu navegador não suporta reconhecimento de voz. Tente usar o Google Chrome no celular ou PC.");
+        }
+    }
+
+    function processarComandoDeVoz(texto) {
+        if(!texto) return;
+
+        const ignorar = ["pegou a", "pegou o", "pegou um", "pegou uma", "pegou", "levou a", "levou o", "levou", "retirou a", "retirou o", "retirou", "com a", "com o", "com"];
+        let textoLimpo = texto.toLowerCase();
         
-        if (func === "" || ferra === "") {
-            alert("Preencha o nome do funcionário e as ferramentas!");
+        ignorar.forEach(palavra => {
+            const regex = new RegExp(`\\b${palavra}\\b`, 'gi');
+            textoLimpo = textoLimpo.replace(regex, ' ');
+        });
+
+        let palavras = textoLimpo.split(/\s+/).filter(p => p.length > 2);
+        let candidatos = [];
+        let nomeUsado = "";
+
+        for (let p of palavras) {
+            let temp = funcionarios.filter(f => f.toLowerCase().includes(p.toLowerCase()));
+            if (temp.length > 0) {
+                candidatos = temp;
+                nomeUsado = p;
+                break;
+            }
+        }
+
+        if (candidatos.length === 0) {
+            alert(`Ouvi: "${texto}".\n\nMas não consegui encontrar esse funcionário na lista. Verifique o nome.`);
             return;
         }
 
-        const dataAtual = new Date().toLocaleString('pt-BR').substring(0, 16);
+        let funcEscolhido = candidatos[0];
+        if (candidatos.length > 1) {
+            let msg = `Ouvi: "${texto}".\nAchei mais de um funcionário. Digite o número correto:\n\n`;
+            candidatos.forEach((c, idx) => msg += `${idx + 1} - ${c}\n`);
+            let resp = prompt(msg);
+            let idx = parseInt(resp) - 1;
+            if (!isNaN(idx) && candidatos[idx]) {
+                funcEscolhido = candidatos[idx];
+            } else {
+                return; 
+            }
+        }
+
+        let regexNome = new RegExp(`\\b${nomeUsado}\\b`, 'gi');
+        let ferramentaFinal = textoLimpo.replace(regexNome, '').trim();
+        ferramentaFinal = ferramentaFinal.replace(/^(um|uma|o|a|os|as)\s+/gi, '').trim();
+
+        if(ferramentaFinal.length < 2) {
+            alert(`Identifiquei o funcionário (${funcEscolhido}), mas não entendi a ferramenta. Tente falar novamente.`);
+            return;
+        }
+
+        ferramentaFinal = ferramentaFinal.charAt(0).toUpperCase() + ferramentaFinal.slice(1);
+        inserirNoBanco(funcEscolhido, ferramentaFinal);
+    }
+
+    function inserirNoBanco(funcionario, ferramenta) {
+        const agora = new Date();
+        const dataDia = document.getElementById('filtro-data').value;
+        let dataStr;
+        
+        if(dataDia) {
+            const [ano, mes, dia] = dataDia.split('-');
+            const hora = String(agora.getHours()).padStart(2, '0');
+            const min = String(agora.getMinutes()).padStart(2, '0');
+            dataStr = `${dia}/${mes}/${ano} ${hora}:${min}`;
+        } else {
+            const dia = String(agora.getDate()).padStart(2, '0');
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const ano = agora.getFullYear();
+            const hora = String(agora.getHours()).padStart(2, '0');
+            const min = String(agora.getMinutes()).padStart(2, '0');
+            dataStr = `${dia}/${mes}/${ano} ${hora}:${min}`;
+        }
 
         bancoDados.unshift({
             id: Date.now(),
-            funcionario: func,
-            ferramenta: ferra,
-            dataHora: dataAtual,
+            funcionario: escaparHTML(funcionario),
+            ferramenta: escaparHTML(ferramenta),
+            dataHora: dataStr,
+            dataFiltro: dataDia || `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`,
             status: 'Pendente'
         });
-
         salvarDB();
-        
-        document.getElementById('input-funcionario').value = '';
-        document.getElementById('input-ferramenta').value = '';
-        document.getElementById('input-funcionario').focus();
     }
 
-    function editarFerramenta(id) {
-        const item = bancoDados.find(i => i.id === id);
-        if (!item) return;
-
-        const novaFerramenta = prompt("Editar ferramenta(s) / quantidade:", item.ferramenta);
-        if (novaFerramenta !== null && novaFerramenta.trim() !== "") {
-            item.ferramenta = novaFerramenta.trim();
-            salvarDB();
-        }
-    }
-
-    function devolverFerramenta(id) {
-        const index = bancoDados.findIndex(item => item.id === id);
-        if (index !== -1) {
-            bancoDados[index].status = 'Devolvido';
-            salvarDB();
-        }
-    }
-
-    function excluirRegistro(id) {
-        if(confirm("Tem certeza que deseja excluir este registro permanentemente?")) {
-            bancoDados = bancoDados.filter(item => item.id !== id);
-            salvarDB();
-            if(funcionarioNoModal && bancoDados.filter(i => i.funcionario === funcionarioNoModal).length === 0){
-                fecharModal();
-            }
-        }
-    }
-
+    // --- TABELA PRINCIPAL AGRUPADA ---
     function renderizarTabela() {
-        const filtro = document.getElementById('filtro-tabela').value.toLowerCase();
         const tbody = document.getElementById('tabela-corpo');
         tbody.innerHTML = '';
 
-        let dadosFiltrados = bancoDados;
-        if (filtro) {
-            dadosFiltrados = bancoDados.filter(i => 
-                i.funcionario.toLowerCase().includes(filtro) || 
-                i.ferramenta.toLowerCase().includes(filtro) ||
-                i.status.toLowerCase().includes(filtro)
-            );
-        }
+        const dataFiltro = document.getElementById('filtro-data').value;
+        const nomeFiltro = document.getElementById('filtro-nome').value.toLowerCase();
 
-        if (dadosFiltrados.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 30px; color: #666;">Nenhum registro encontrado.</td></tr>`;
+        let dadosDoDia = bancoDados.filter(item => {
+            let itemDate = item.dataFiltro;
+            if(!itemDate && item.dataHora) {
+                const partes = item.dataHora.split(' ')[0].split('/');
+                itemDate = `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+            let bateData = (!dataFiltro || itemDate === dataFiltro);
+            let bateNome = (!nomeFiltro || item.funcionario.toLowerCase().includes(nomeFiltro));
+            return bateData && bateNome;
+        });
+
+        if (dadosDoDia.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px; color: #666;">Nenhum registro para esta data.</td></tr>`;
             return;
         }
 
-        dadosFiltrados.forEach(item => {
+        let grupos = {};
+        dadosDoDia.forEach(i => {
+            if(!grupos[i.funcionario]) grupos[i.funcionario] = { total: 0, pendentes: 0 };
+            grupos[i.funcionario].total++;
+            if(i.status === 'Pendente') grupos[i.funcionario].pendentes++;
+        });
+
+        let nomesOrdenados = Object.keys(grupos).sort((a, b) => a.localeCompare(b));
+
+        nomesOrdenados.forEach(nome => {
+            const funcData = grupos[nome];
             const tr = document.createElement('tr');
             
-            const badgeClass = item.status === 'Pendente' ? 'badge-pendente' : 'badge-devolvido';
-            const statusVisual = `<span class="badge ${badgeClass}">${item.status}</span>`;
-            
-            let botoesAcao = '';
-            botoesAcao += `<button class="btn-acao btn-editar" onclick="editarFerramenta(${item.id})" title="Editar ferramenta"><i class="fas fa-edit"></i></button>`;
-            if (item.status === 'Pendente') {
-                botoesAcao += `<button class="btn-acao btn-devolver" onclick="devolverFerramenta(${item.id})" title="Marcar como devolvido"><i class="fas fa-undo"></i></button>`;
-            }
-            botoesAcao += `<button class="btn-acao btn-excluir" onclick="excluirRegistro(${item.id})" title="Apagar Registro"><i class="fas fa-trash"></i></button>`;
+            let statusVisual = funcData.pendentes > 0 
+                ? `<span class="badge badge-pendente">${funcData.pendentes} Pendente(s)</span>` 
+                : `<span class="badge badge-devolvido">Tudo Devolvido</span>`;
 
             tr.innerHTML = `
                 <td>
-                    <span class="nome-clicavel" onclick="abrirModal('${item.funcionario}')" title="Ver histórico deste funcionário">
-                        <i class="fas fa-link"></i> ${item.funcionario}
+                    <span style="font-weight: 700; color: var(--dark-green); display: flex; align-items: center; gap: 8px; font-size: 15px;">
+                        <i class="fas fa-user-circle" style="color: var(--lime-green);"></i> ${nome}
                     </span>
                 </td>
-                <td>${item.ferramenta}</td>
-                <td>${item.dataHora}</td>
-                <td>${RESPONSAVEL_FIXO}</td>
+                <td><strong>${funcData.total}</strong> ferramentas</td>
                 <td>${statusVisual}</td>
-                <td>${botoesAcao}</td>
+                <td>
+                    <button class="btn-acao btn-abrir" onclick="abrirModal('${nome}')"><i class="fas fa-list"></i> Detalhes</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
     }
 
+    // --- JANELA MODAL ---
     function abrirModal(nome) {
         funcionarioNoModal = nome;
         document.getElementById('modal-nome-destaque').innerText = nome;
         document.getElementById('modal-historico').style.display = 'flex';
         renderizarModal(nome);
     }
-
-    function fecharModal() {
-        document.getElementById('modal-historico').style.display = 'none';
-        funcionarioNoModal = null;
-    }
-
-    function fecharModalFora(event) {
-        if (event.target.id === 'modal-historico') {
-            fecharModal();
-        }
-    }
+    function fecharModal() { document.getElementById('modal-historico').style.display = 'none'; funcionarioNoModal = null; }
+    function fecharModalFora(e) { if (e.target.id === 'modal-historico') fecharModal(); }
 
     function renderizarModal(nome) {
         const tbodyModal = document.getElementById('modal-tabela-corpo');
         tbodyModal.innerHTML = '';
         
-        const registros = bancoDados.filter(i => i.funcionario === nome);
+        const dataFiltro = document.getElementById('filtro-data').value;
+        const registros = bancoDados.filter(item => {
+             let itemDate = item.dataFiltro;
+             if(!itemDate && item.dataHora) {
+                const partes = item.dataHora.split(' ')[0].split('/');
+                itemDate = `${partes[2]}-${partes[1]}-${partes[0]}`;
+             }
+             return item.funcionario === nome && (!dataFiltro || itemDate === dataFiltro);
+        });
         
+        if(registros.length === 0) {
+            fecharModal();
+            return;
+        }
+
         registros.forEach(item => {
             const tr = document.createElement('tr');
             const badgeClass = item.status === 'Pendente' ? 'badge-pendente' : 'badge-devolvido';
             const statusVisual = `<span class="badge ${badgeClass}">${item.status}</span>`;
             
-            let botoesAcao = '';
-            botoesAcao += `<button class="btn-acao btn-editar" onclick="editarFerramenta(${item.id})" title="Editar"><i class="fas fa-edit"></i> Editar</button>`;
+            let botoes = `<button class="btn-acao btn-editar" onclick="editarFerramenta(${item.id})"><i class="fas fa-edit"></i></button>`;
             if (item.status === 'Pendente') {
-                botoesAcao += `<button class="btn-acao btn-devolver" onclick="devolverFerramenta(${item.id})" title="Marcar como devolvido"><i class="fas fa-undo"></i> Devolver</button>`;
+                botoes += `<button class="btn-acao btn-devolver" onclick="devolverFerramenta(${item.id})"><i class="fas fa-undo"></i> Devolver</button>`;
             }
-            botoesAcao += `<button class="btn-acao btn-excluir" onclick="excluirRegistro(${item.id})" title="Excluir"><i class="fas fa-trash"></i></button>`;
+            botoes += `<button class="btn-acao btn-excluir" onclick="excluirRegistro(${item.id})"><i class="fas fa-trash"></i></button>`;
 
             tr.innerHTML = `
                 <td><strong>${item.ferramenta}</strong></td>
-                <td>${item.dataHora}</td>
-                <td>${RESPONSAVEL_FIXO}</td>
+                <td>${item.dataHora.split(' ')[1] || item.dataHora}</td>
                 <td>${statusVisual}</td>
-                <td>${botoesAcao}</td>
+                <td>${botoes}</td>
             `;
             tbodyModal.appendChild(tr);
         });
     }
 
-    function gerarPDF() {
-        if(bancoDados.length === 0) {
-            alert("Não há dados para gerar o relatório.");
-            return;
+    function editarFerramenta(id) {
+        const item = bancoDados.find(i => i.id === id);
+        if (!item) return;
+        const nova = prompt("Editar ferramenta:", item.ferramenta);
+        if (nova !== null && nova.trim() !== "") {
+            item.ferramenta = escaparHTML(nova.trim());
+            salvarDB();
+        }
+    }
+    function devolverFerramenta(id) {
+        const index = bancoDados.findIndex(item => item.id === id);
+        if (index !== -1) { bancoDados[index].status = 'Devolvido'; salvarDB(); }
+    }
+    function excluirRegistro(id) {
+        if(confirm("Excluir este registro?")) {
+            bancoDados = bancoDados.filter(item => item.id !== id);
+            salvarDB();
+        }
+    }
+
+    // --- GERADOR DE PDF ---
+    function gerarPDF(tipoFiltro) {
+        const dataFiltro = document.getElementById('filtro-data').value;
+        let dadosDoDia = bancoDados.filter(item => {
+            let itemDate = item.dataFiltro;
+            if(!itemDate && item.dataHora) {
+                const partes = item.dataHora.split(' ')[0].split('/');
+                itemDate = `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+            return (!dataFiltro || itemDate === dataFiltro);
+        });
+
+        if (tipoFiltro === 'Pendentes') dadosDoDia = dadosDoDia.filter(i => i.status === 'Pendente');
+        if (tipoFiltro === 'Devolvidos') dadosDoDia = dadosDoDia.filter(i => i.status === 'Devolvido');
+
+        if(dadosDoDia.length === 0) {
+            alert(`Não há registros "${tipoFiltro}" para esta data.`); return;
         }
 
-        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-        const dataHoje = new Date();
-        const diaAtual = String(dataHoje.getDate()).padStart(2, '0');
-        const mesAtual = meses[dataHoje.getMonth()];
-        const anoAtual = dataHoje.getFullYear();
-        
-        document.getElementById('rodape-pdf').innerText = `Raul Soares MG, ${diaAtual} de ${mesAtual} de ${anoAtual}.`;
+        document.getElementById('pdf-subtitulo').innerText = `Situação: ${tipoFiltro}`;
+        document.getElementById('pdf-data-filtro').innerText = `Data Referência: ${formatarDataBR(dataFiltro) || 'Todas'}`;
 
+        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        const hoje = new Date();
+        const localUser = document.getElementById('input-local').value || 'Sua Cidade - UF';
+        
+        document.getElementById('rodape-pdf').innerText = `${localUser}, ${String(hoje.getDate()).padStart(2,'0')} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}.`;
+
+        dadosDoDia.sort((a, b) => a.funcionario.localeCompare(b.funcionario));
+        
         const corpoPdf = document.getElementById('tabela-pdf-corpo');
         corpoPdf.innerHTML = '';
 
-        bancoDados.forEach(item => {
+        dadosDoDia.forEach(item => {
             const tr = document.createElement('tr');
             let colorSit = item.status === 'Pendente' ? 'color: #de350b; font-weight: bold;' : 'color: #00875a; font-weight: bold;';
-            
             tr.innerHTML = `
                 <td><strong>${item.funcionario}</strong></td>
                 <td>${item.ferramenta}</td>
                 <td>${item.dataHora}</td>
-                <td>${RESPONSAVEL_FIXO}</td>
                 <td style="${colorSit}">${item.status}</td>
             `;
             corpoPdf.appendChild(tr);
@@ -676,17 +793,20 @@
         const elemento = document.getElementById('area-pdf');
         elemento.style.display = 'block'; 
 
-        const config = {
-            margin:       15,
-            filename:     'Engesp_Relatorio_Ferramentas.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
-        };
+        // Aguarda 150ms para garantir o carregamento total das imagens SVG antes de capturar a tela
+        setTimeout(() => {
+            const config = {
+                margin:       10,
+                filename:     `Engesp_Tools_${tipoFiltro}_${dataFiltro || 'Geral'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
 
-        html2pdf().set(config).from(elemento).save().then(() => {
-            elemento.style.display = 'none';
-        });
+            html2pdf().set(config).from(elemento).save().then(() => {
+                elemento.style.display = 'none';
+            });
+        }, 150);
     }
 </script>
 
