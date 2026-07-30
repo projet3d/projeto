@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Biblioteca para gerar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Biblioteca PDF.js para importar/ler PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     
     <style>
         :root {
@@ -34,10 +36,10 @@
             padding: 0;
         }
 
-        /* Cabeçalho Compacto (AJUSTADO) */
+        /* Cabeçalho Compacto */
         .header {
             background-color: var(--dark-green);
-            padding: 8px 20px; /* Reduzido para ocupar menos espaço */
+            padding: 8px 20px;
             border-bottom: 3px solid var(--lime-green);
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             display: flex;
@@ -52,7 +54,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 130px; /* Logo menor */
+            width: 130px;
         }
         .logo-swooshes {
             width: 100%;
@@ -62,7 +64,7 @@
         .logo-titulo {
             color: #ffffff;
             margin: 0;
-            font-size: 26px; /* Fonte menor */
+            font-size: 26px;
             font-weight: 900;
             font-family: 'Arial Black', sans-serif;
             letter-spacing: -1.5px;
@@ -71,7 +73,7 @@
         }
         .logo-subtitulo {
             color: var(--lime-green);
-            font-size: 7px; /* Subtítulo menor */
+            font-size: 7px;
             font-weight: bold;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -81,7 +83,7 @@
         
         .header-system-name {
             color: #e3fcef;
-            font-size: 14px; /* Texto menor */
+            font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -94,6 +96,7 @@
         .card {
             background: var(--bg-card); border-radius: 8px; padding: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; border: 1px solid var(--border);
+            position: relative;
         }
 
         /* Top Bar */
@@ -118,6 +121,29 @@
         .btn-pdf-pend { background: #b36200; }
         .btn-pdf-dev { background: var(--success); }
         .btn-pdf:hover { opacity: 0.85; }
+
+        /* Botão Importar Discreto */
+        .btn-import-discreto {
+            background: transparent;
+            color: #6b778c;
+            border: 1px solid #dfe1e6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+            opacity: 0.7;
+        }
+        .btn-import-discreto:hover {
+            opacity: 1;
+            background: #f4f5f7;
+            color: var(--dark);
+            border-color: #c1c7d0;
+        }
 
         /* Registro Flex */
         .acoes-registro {
@@ -218,7 +244,6 @@
 
 <div class="header">
     <div style="display: flex; align-items: center; gap: 15px;">
-        <!-- Logo Engesp no Cabeçalho -->
         <div class="logo-engesp-container">
             <img class="logo-swooshes" src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 45' width='220' height='45'%3E%3Cpath d='M 10 38 C 60 48, 130 42, 185 24' stroke='%237a8a29' stroke-width='4.5' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 22 29 C 70 39, 140 33, 198 14' stroke='%237a8a29' stroke-width='2.8' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 35 20 C 80 30, 150 24, 212 4' stroke='%237a8a29' stroke-width='1.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E" alt="Engesp Riscas">
             <h1 class="logo-titulo">engesp</h1>
@@ -255,7 +280,15 @@
 
     <!-- Painel de Registros -->
     <div class="card">
-        <h2 class="section-title"><i class="fas fa-plus-circle"></i> Novo Empréstimo</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="section-title"><i class="fas fa-plus-circle"></i> Novo Empréstimo</h2>
+            
+            <!-- Botão Importar Discreto e Menor -->
+            <button class="btn-import-discreto" onclick="document.getElementById('input-import-pdf').click()" title="Importar lista via PDF">
+                <i class="fas fa-file-import"></i> Importar
+            </button>
+            <input type="file" id="input-import-pdf" accept=".pdf" style="display: none;" onchange="importarPDF(event)">
+        </div>
         
         <div class="acoes-registro">
             <div class="registro-grid">
@@ -270,7 +303,6 @@
                 </div>
             </div>
             
-            <!-- Botões de Ação -->
             <button type="button" class="btn-add" onclick="registrarFerramenta()"><i class="fas fa-check"></i> Registrar</button>
             <button type="button" id="btn-voz" class="btn-voz" onclick="iniciarReconhecimentoVoz()" title="Fale: '[Nome] pegou [Ferramenta]'">
                 <i class="fas fa-microphone"></i> Por Voz
@@ -292,7 +324,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Funcionário (Ordem Alfabética)</th>
+                        <th>Funcionário</th>
                         <th>Ferramentas Pegas</th>
                         <th>Situação do Dia</th>
                         <th>Ações</th>
@@ -345,7 +377,6 @@
 <div id="area-pdf" style="display: none; padding: 40px; font-family: 'Arial', sans-serif; color: #000; background: #fff;">
     <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #004333; padding-bottom: 20px;">
         <div style="display: flex; flex-direction: column; align-items: center; margin-right: 40px; width: 220px;">
-            <!-- Imagem com as riscas idênticas para renderizar perfeitamente no PDF -->
             <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 45' width='220' height='45'%3E%3Cpath d='M 10 38 C 60 48, 130 42, 185 24' stroke='%237a8a29' stroke-width='4.5' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 22 29 C 70 39, 140 33, 198 14' stroke='%237a8a29' stroke-width='2.8' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 35 20 C 80 30, 150 24, 212 4' stroke='%237a8a29' stroke-width='1.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E" style="width: 100%; height: auto; margin-bottom: -5px;" alt="Engesp Riscas">
             <h1 style="color: #004333; margin: 0; font-size: 55px; font-weight: 900; font-family: 'Arial Black', sans-serif; letter-spacing: -2px; line-height: 0.9; text-align: center;">engesp</h1>
             <div style="color: #7a8a29; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; text-align: center; margin-top: 4px;">Engenharia São Patrício</div>
@@ -444,7 +475,6 @@
         if (e.key === 'Enter') registrarFerramenta();
     });
 
-    // --- AUTOCOMPLETE ---
     function filtrarNomes() {
         const termo = inputFunc.value.toLowerCase();
         listaAuto.innerHTML = '';
@@ -491,7 +521,6 @@
         inputFunc.value = ''; inputFerra.value = ''; inputFunc.focus();
     }
 
-    // --- RECONHECIMENTO DE VOZ ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
 
@@ -618,7 +647,121 @@
         salvarDB();
     }
 
-    // --- TABELA PRINCIPAL AGRUPADA ---
+    /* FUNCIONALIDADE DE IMPORTAR PDF */
+    async function importarPDF(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        const reader = new FileReader();
+        reader.onload = async function() {
+            try {
+                const typedarray = new Uint8Array(this.result);
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                let textoCompleto = [];
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const items = textContent.items;
+
+                    let lastY = null;
+                    let currentLine = [];
+                    let lines = [];
+
+                    items.forEach(item => {
+                        if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+                            lines.push(currentLine.join(' ').trim());
+                            currentLine = [];
+                        }
+                        if (item.str.trim()) {
+                            currentLine.push(item.str.trim());
+                        }
+                        lastY = item.transform[5];
+                    });
+                    if (currentLine.length > 0) lines.push(currentLine.join(' ').trim());
+                    textoCompleto.push(...lines);
+                }
+
+                processarTextoPDF(textoCompleto);
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao ler o PDF. Certifique-se de que é um documento válido contendo texto.");
+            }
+            event.target.value = '';
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function processarTextoPDF(linhas) {
+        let importados = 0;
+        const textoUnificado = linhas.join(' ');
+
+        funcionarios.forEach(func => {
+            const regexFunc = new RegExp(func.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+            let match;
+
+            while ((match = regexFunc.exec(textoUnificado)) !== null) {
+                const startIndex = match.index;
+                const trecho = textoUnificado.substring(startIndex, startIndex + 180);
+
+                let status = "Pendente";
+                if (/devolvido/i.test(trecho)) {
+                    status = "Devolvido";
+                }
+
+                const dateMatch = trecho.match(/(\d{2}\/\d{2}\/\d{4})(?:\s+(\d{2}:\d{2}))?/);
+                let dataHora = "";
+                let dataFiltro = "";
+                const agora = new Date();
+
+                if (dateMatch) {
+                    const dataPart = dateMatch[1];
+                    const horaPart = dateMatch[2] || "08:00";
+                    dataHora = `${dataPart} ${horaPart}`;
+                    const [d, m, y] = dataPart.split('/');
+                    dataFiltro = `${y}-${m}-${d}`;
+                } else {
+                    const dia = String(agora.getDate()).padStart(2, '0');
+                    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+                    const ano = agora.getFullYear();
+                    const hora = String(agora.getHours()).padStart(2, '0');
+                    const min = String(agora.getMinutes()).padStart(2, '0');
+                    dataHora = `${dia}/${mes}/${ano} ${hora}:${min}`;
+                    dataFiltro = `${ano}-${mes}-${dia}`;
+                }
+
+                let ferraLimpa = trecho.substring(func.length);
+                const idxStatus = ferraLimpa.search(/pendente|devolvido/i);
+                if (idxStatus !== -1) ferraLimpa = ferraLimpa.substring(0, idxStatus);
+
+                ferraLimpa = ferraLimpa.replace(/\d{2}\/\d{2}\/\d{4}(\s+\d{2}:\d{2})?/, '');
+                ferraLimpa = ferraLimpa.replace(/[|;\-\t\n]/g, ' ').trim();
+
+                if (!ferraLimpa || ferraLimpa.length < 2) ferraLimpa = "Ferramenta Importada";
+
+                bancoDados.unshift({
+                    id: Date.now() + Math.random(),
+                    funcionario: escaparHTML(func),
+                    ferramenta: escaparHTML(ferraLimpa),
+                    dataHora: dataHora,
+                    dataFiltro: dataFiltro,
+                    status: status
+                });
+                importados++;
+            }
+        });
+
+        if (importados > 0) {
+            document.getElementById('filtro-data').value = ''; 
+            salvarDB();
+            alert(`${importados} empréstimo(s) importado(s) com sucesso!`);
+        } else {
+            alert("Nenhum funcionário cadastrado foi encontrado no PDF. Verifique se o arquivo possui texto selecionável.");
+        }
+    }
+
     function renderizarTabela() {
         const tbody = document.getElementById('tabela-corpo');
         tbody.innerHTML = '';
@@ -675,7 +818,6 @@
         });
     }
 
-    // --- JANELA MODAL ---
     function abrirModal(nome) {
         funcionarioNoModal = nome;
         document.getElementById('modal-nome-destaque').innerText = nome;
@@ -745,7 +887,6 @@
         }
     }
 
-    // --- GERADOR DE PDF ---
     function gerarPDF(tipoFiltro) {
         const dataFiltro = document.getElementById('filtro-data').value;
         let dadosDoDia = bancoDados.filter(item => {
@@ -793,7 +934,6 @@
         const elemento = document.getElementById('area-pdf');
         elemento.style.display = 'block'; 
 
-        // Aguarda 150ms para garantir o carregamento total das imagens SVG antes de capturar a tela
         setTimeout(() => {
             const config = {
                 margin:       10,
