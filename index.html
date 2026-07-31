@@ -409,6 +409,51 @@
 </div>
 
 <script>
+
+    // ==========================================
+    // 1. CONFIGURAÇÃO DO SUPABASE
+    // ==========================================
+    const supabaseUrl = 'https://lbjwrqovxxudgjmhocvk.supabase.co/rest/v1/'; // <-- COLOQUE SUA URL AQUI
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiandycW92eHh1ZGdqbWhvY3ZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NDU1NTYsImV4cCI6MjEwMTAyMTU1Nn0.7-EGwz4cCEOFVzeJ6QqrZVssHFg1JNjqCqKcrqrO9Dc.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhZHVvY2VpY2dyamxoenJmY3NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NDQ5MTIsImV4cCI6MjEwMTAyMDkxMn0.usb6Fem4gsf0lzu7vKgeWISSINvfrELHe9b6al9lNTc'; // <-- COLOQUE SUA CHAVE AQUI
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // ==========================================
+    // 2. COMUNICAÇÃO COM O BANCO DE DADOS (SUPABASE)
+    // ==========================================
+    async function carregarDadosDoSupabase() {
+        const { data, error } = await supabase.from('ferramentas').select('*').order('id', { ascending: false });
+        if (error) return console.error('Erro ao carregar do Supabase:', error);
+        bancoDados = data || [];
+        renderizarTabela();
+        if (funcionarioNoModal) renderizarModal(funcionarioNoModal);
+    }
+
+    async function inserirNoBanco(funcionario, ferramenta) {
+        const agora = new Date();
+        const dataDia = document.getElementById('filtro-data').value;
+        let dataStr;
+        
+        if(dataDia) {
+            const [ano, mes, dia] = dataDia.split('-');
+            dataStr = `${dia}/${mes}/${ano} ${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+        } else {
+            dataStr = `${String(agora.getDate()).padStart(2, '0')}/${String(agora.getMonth() + 1).padStart(2, '0')}/${agora.getFullYear()} ${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+        }
+
+        const novoRegistro = {
+            funcionario: escaparHTML(funcionario),
+            ferramenta: escaparHTML(ferramenta),
+            dataHora: dataStr,
+            dataFiltro: dataDia || `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`,
+            status: 'Pendente'
+        };
+
+        const { error } = await supabase.from('ferramentas').insert([novoRegistro]);
+        if (!error) await carregarDadosDoSupabase();
+        else alert("Erro ao salvar no banco de dados.");
+    }
+
+    
     const funcionarios = [
         "ADEILTON LIMA DE ALMEIDA", "ALEXANDRE ALVES DOS SANTOS", "ANTONIO RODRIGUES DE CARVALHO FILHO",
         "BENEDITO GOMES DA SILVA", "BRUNO SILVA CORREIA", "CARLOS ROBERTO PESSOA", "CARLOS SANTOS PEREIRA",
