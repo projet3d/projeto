@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Ponto Inteligente - ENGESP</title>
+    <!-- Biblioteca de IA para Reconhecimento Facial -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        :root {
+            --primary: #00382b;
+            --primary-hover: #00241b;
+            --accent: #7e8b26;
+            --bg: #f0f4f8;
+            --text: #1e293b;
+            --card: #ffffff;
+            --border: #cbd5e1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background-color: var(--card);
+            padding: 25px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 850px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* ACESSO ADMIN DISCRETO NO TOPO */
+        .admin-top-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            width: auto;
+            box-shadow: none;
+        }
+        .admin-top-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary);
+        }
+
+        .logo-container { text-align: center; margin-top: 10px; margin-bottom: 10px; }
+        
+        .relogio-container {
+            text-align: center; margin: 10px 0 20px 0; padding: 12px;
+            background: #f8fafc; border-radius: 12px; border: 1px solid var(--border);
+        }
+        #relogio-digital { font-size: 38px; font-weight: 800; color: var(--primary); font-family: monospace; letter-spacing: -1px; }
+        #data-atual { font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+
+        /* BOTÃO CIRCULAR PULSANTE CENTRAL */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(0, 56, 43, 0.4); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 18px rgba(0, 56, 43, 0); }
+            100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(0, 56, 43, 0); }
+        }
+
+        .pulse-circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 25px 0;
+        }
+
+        .btn-biometric-circle {
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #005640);
+            color: white;
+            border: 4px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            animation: pulse-ring 2.2s infinite ease-in-out;
+            transition: all 0.3s ease;
+            box-shadow: 0 12px 25px rgba(0, 56, 43, 0.25);
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .btn-biometric-circle:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #00241b, var(--primary));
+        }
+        .btn-biometric-circle svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 8px;
+            fill: #ffffff;
+        }
+        .btn-biometric-circle span {
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        button {
+            background-color: var(--primary); color: white; border: none;
+            padding: 14px 20px; border-radius: 8px; cursor: pointer;
+            font-size: 15px; font-weight: bold; transition: 0.3s; width: 100%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+        }
+        button:hover:not(:disabled) { background-color: var(--primary-hover); transform: translateY(-1px); }
+        button:disabled { background-color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .btn-inline { width: auto; margin-top: 0; box-shadow: none; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: #dc2626; }
+        .btn-edit { background-color: var(--info); }
+        .btn-edit:hover { background-color: #2563eb; }
+        .btn-export { background-color: var(--accent); }
+        .btn-import { background-color: var(--purple); }
+        .btn-import:hover { background-color: #7c3aed; }
+        .btn-secondary { background-color: #ffffff; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-secondary:hover { background-color: #f1f5f9; }
+
+        select, input {
+            width: 100%; padding: 12px 14px; margin: 6px 0 16px 0;
+            border: 1.5px solid var(--border); border-radius: 8px;
+            box-sizing: border-box; font-size: 15px; background-color: #f8fafc;
+            transition: border-color 0.2s;
+        }
+        select:focus, input:focus { outline: none; border-color: var(--primary); background-color: #fff; }
+        label { font-weight: 700; color: var(--primary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hidden { display: none !important; }
+        
+        /* CÂMERA E STATUS */
+        .camera-wrapper {
+            position: relative; width: 100%; max-width: 320px; margin: 0 auto 15px auto;
+            border-radius: 16px; overflow: hidden; background: #000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        video { width: 100%; height: auto; display: block; transform: scaleX(-1); }
+        
+        .status-box { padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 15px; background: #e2e8f0; color: #334155; font-size: 14px;}
+        .status-reconhecido { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .status-novo { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+        .status-erro { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+
+        /* DASHBOARD ADMIN */
+        .dash-container { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .dash-card {
+            flex: 1; min-width: 150px; background: #fff; border: 1px solid var(--border);
+            border-radius: 12px; padding: 15px; text-align: center;
+        }
+        .dash-card h4 { margin: 0; font-size: 12px; color: #64748b; text-transform: uppercase; }
+        .dash-card .valor { font-size: 30px; font-weight: 800; color: var(--primary); margin-top: 5px; }
+
+        .table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 100%; }
+        th, td { padding: 12px 10px; text-align: center; border-bottom: 1px solid var(--border); vertical-align: middle;}
+        th { background-color: #f1f5f9; color: var(--text); white-space: nowrap; font-weight: 700; }
+        
+        .foto-miniatura { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; color: white; display: inline-block; text-transform: uppercase;}
+        .badge-entrada { background-color: var(--success); }
+        .badge-almoco-saida { background-color: #f59e0b; color: #78350f; }
+        .badge-almoco-retorno { background-color: #3b82f6; }
+        .badge-saida { background-color: var(--danger); }
+        .badge-he { background-color: var(--purple); }
+
+        /* ESTILOS ADMIN - CARDS AGRUPADOS POR FUNCIONÁRIO */
+        .employee-card {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .employee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            cursor: pointer;
+            background-color: #f1f5f9;
+            border-left: 5px solid var(--primary);
+            font-weight: 700;
+        }
+        .employee-header:hover {
+            background-color: #e2e8f0;
+        }
+        .history-content {
+            display: none;
+            padding: 15px;
+            background-color: #ffffff;
+            border-top: 1px solid var(--border);
+        }
+        .history-content.active {
+            display: block;
+        }
+        .day-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .day-row:last-child {
+            border-bottom: none;
+        }
+        .punch-tags-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .punch-tag {
+            background: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+        .punch-tag.missing {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: #fee2e2;
+        }
+        
+        /* MODAL E RECIBO */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content { background: white; padding: 25px 30px; border-radius: 16px; width: 90%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;}
+        .modal-content h3 { margin-top: 0; color: var(--primary); }
+
+        .recibo { border: 2px dashed var(--border); padding: 20px; text-align: center; background: #f8fafc; border-radius: 8px; margin-bottom: 20px;}
+        .recibo h3 { margin: 0 0 10px 0; color: var(--primary); }
+        .recibo p { margin: 5px 0; font-size: 14px; }
+        .recibo .destaque { font-size: 24px; font-weight: 900; color: var(--text); margin: 10px 0; }
+        .foto-comprovante { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 10px auto; display: block; border: 3px solid var(--success); }
+        
+        .gestao-box { background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 25px; }
+        .gestao-box h3 { margin-top: 0; color: var(--primary); font-size: 16px; margin-bottom: 15px;}
+        
+        .footer { text-align: center; font-size: 12px; color: #64748b; margin-top: 25px; font-weight: 600; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 15px; }
+        .footer .creator { color: var(--primary); font-weight: 800; display: block; font-size: 13px; margin-top: 3px; }
+        .footer .copy { font-size: 11px; color: #94a3b8; font-weight: 500; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- BOTAO ADMIN DISCRETO NO TOPO -->
+        <button class="admin-top-btn" onclick="mostrarTelaLoginAdmin()">🔒 Admin</button>
+
+        <div class="logo-container">
+            <svg viewBox="0 0 500 150" width="240" height="70" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 40,48 Q 250,10 480,16" fill="none" stroke="#8C9B25" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M 28,58 Q 250,20 465,36" fill="none" stroke="#7E8B26" stroke-width="5" stroke-linecap="round"/>
+                <path d="M 15,68 Q 250,32 445,56" fill="none" stroke="#63721A" stroke-width="7.5" stroke-linecap="round"/>
+                <text x="250" y="114" text-anchor="middle" font-family="'Arial Black', 'Impact', sans-serif" font-weight="900" font-size="76" fill="#00382B" letter-spacing="-3">engesp</text>
+                <text x="250" y="142" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-weight="600" font-size="18" fill="#7E8B26" letter-spacing="5">Engenharia São Patrício</text>
+            </svg>
+        </div>
+
+        <!-- TELA INICIAL (MENU PRINCIPAL) -->
+        <div id="tela-inicial">
+            <div class="relogio-container">
+                <div id="data-atual">Carregando data...</div>
+                <div id="relogio-digital">00:00:00</div>
+            </div>
+
+            <div style="max-width: 400px; margin: 0 auto;">
+                <label for="select-obra-inicial">Obra / Local de Trabalho:</label>
+                <select id="select-obra-inicial"></select>
+
+                <label for="tipo-batida-inicial">Movimento:</label>
+                <select id="tipo-batida-inicial">
+                    <option value="Entrada">📥 ENTRADA (Início do Turno)</option>
+                    <option value="Saída Almoço">🥗 SAÍDA ALMOÇO (12:00)</option>
+                    <option value="Retorno Almoço">🍲 RETORNO ALMOÇO (13:00)</option>
+                    <option value="Saída">📤 SAÍDA (Fim do Expediente)</option>
+                </select>
+            </div>
+
+            <!-- BOTÃO PULSANTE CIRCULAR -->
+            <div class="pulse-circle-container">
+                <div class="btn-biometric-circle" onclick="iniciarFluxoBiometrico('ponto')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/>
+                    </svg>
+                    <span>Registrar Ponto<br>Biométrico</span>
+                </div>
+            </div>
+
+            <div style="max-width: 400px; margin: 0 auto 10px auto;">
+                <button class="btn-secondary" style="padding: 14px; font-size: 15px;" onclick="iniciarFluxoBiometrico('historico')">
+                    🕒 Consultar Meu Histórico (Biometria)
+                </button>
+            </div>
+            
+            <div id="status-carregamento-ia" class="status-box" style="margin-top: 15px;">Carregando Inteligência Artificial...</div>
+        </div>
+
+        <!-- TELA DA CÂMERA BIOMÉTRICA -->
+        <div id="tela-camera" class="hidden">
+            <h3 id="titulo-camera" style="text-align: center; color: var(--primary); margin-top: 0;">Posicione seu Rosto</h3>
+            
+            <div class="camera-wrapper">
+                <video id="video-feed" autoplay playsinline></video>
+            </div>
+            
+            <div id="status-ia" class="status-box">Aguardando posicionamento do rosto...</div>
+            
+            <!-- Ações para Ponto -->
+            <div id="acoes-ponto">
+                <button id="btn-capturar" onclick="processarBiometriaPonto()" style="padding: 16px; font-size: 17px; background-color: var(--accent);">📷 Confirmar e Bater Ponto</button>
+            </div>
+
+            <!-- PASSO DE VÍNCULO (Se IA não reconhecer na hora da batida) -->
+            <div id="secao-vincular" class="hidden">
+                <div class="status-box status-novo">Rosto novo ou não reconhecido. Selecione seu nome:</div>
+                
+                <label for="select-colaborador">Colaborador:</label>
+                <select id="select-colaborador"></select>
+
+                <button onclick="vincularEFinalizar()" style="background-color: var(--primary); padding: 16px; margin-top: 10px;">✅ Confirmar Identidade e Salvar Rosto</button>
+            </div>
+
+            <button class="btn-inline" style="background-color: transparent; color: #64748b; width: 100%; margin-top: 15px;" onclick="cancelarFluxoCamera()">Voltar ao Início</button>
+        </div>
+
+        <!-- TELA DE HISTÓRICO PRIVADO DO FUNCIONÁRIO -->
+        <div id="tela-historico-func" class="hidden">
+            <h2 style="color: var(--primary); text-align: center; margin-top: 0;">🕒 Espelho de Ponto Individual</h2>
+            
+            <div class="gestao-box" style="margin-bottom: 15px; text-align: center;">
+                <span style="font-size: 13px; color: #64748b; font-weight: 600;">Colaborador:</span>
+                <div id="historico-nome-exibido" style="font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 5px;">-</div>
+            </div>
+
+            <div class="table-wrapper" style="max-height: 380px; overflow-y: auto; margin-bottom: 20px;">
+                <table id="tabela-historico-func" style="min-width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Entrada</th>
+                            <th>S. Almoço</th>
+                            <th>R. Almoço</th>
+                            <th>Saída Final</th>
+                            <th>Obra</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 20px;">Carregando registros...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button onclick="voltarAoInicio()" style="background-color: var(--primary); padding: 16px; width: 100%;">⬅️ Voltar ao Início</button>
+        </div>
+
+        <!-- TELA DO ADMIN (PAINEL GERENCIAL) -->
+        <div id="tela-admin" class="hidden">
+            <h2 style="color: var(--primary); margin-top: 0;">Painel Gerencial</h2>
+            
+            <div class="dash-container">
+                <div class="dash-card"><h4>Batidas Hoje</h4><div class="valor" id="dash-hoje">0</div></div>
+                <div class="dash-card"><h4>Total Registros</h4><div class="valor" id="dash-total">0</div></div>
+            </div>
+
+            <!-- GESTÃO DE OBRAS -->
+            <div class="gestao-box">
+                <h3>🏗️ Gerenciar Obras / Locais</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="input-nova-obra" placeholder="Ex: Obra Centro - São Paulo" style="margin: 0; flex: 1; min-width: 180px;">
+                    <button onclick="adicionarObra()" class="btn-inline" style="background-color: var(--primary);">+ Adicionar</button>
+                    <button onclick="importarObras()" class="btn-inline btn-import">📥 Importar Lista</button>
+                </div>
+                <div class="table-wrapper" style="margin-top: 15px; max-height: 140px; overflow-y: auto;">
+                    <table id="tabela-obras"><tbody></tbody></table>
+                </div>
+            </div>
+
+            <!-- GESTÃO DE COLABORADORES -->
+            <div class="gestao-box">
+                <h3>👥 Gerenciar Colaboradores</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="input-novo-func" placeholder="Ex: NOME - Matrícula: 1234" style="margin: 0; flex: 1; min-width: 180px;">
+                    <button onclick="adicionarFuncionario()" class="btn-inline" style="background-color: var(--primary);">+ Adicionar</button>
+                    <button onclick="importarFuncionarios()" class="btn-inline btn-import">📥 Importar Lista</button>
+                </div>
+                <div class="table-wrapper" style="margin-top: 15px; max-height: 160px; overflow-y: auto;">
+                    <table id="tabela-colaboradores"><tbody></tbody></table>
+                </div>
+            </div>
+
+            <h3 style="color: var(--primary); font-size: 16px;">Apontamentos por Funcionário (Histórico Organizado)</h3>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                <button class="btn-inline btn-export" onclick="exportarCSV()" style="flex: 1; min-width: 180px;">📊 Exportar Planilha (RH)</button>
+                <button class="btn-inline" style="background-color: var(--primary); flex: 1; min-width: 180px;" onclick="abrirModalManual()">➕ Lançamento Manual / Hora Extra</button>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="filtro-nome" placeholder="🔍 Buscar colaborador..." onkeyup="renderizarTabelaAdmin()" style="flex: 1; margin: 0;">
+                <input type="date" id="filtro-data" onchange="renderizarTabelaAdmin()" style="flex: 1; margin: 0;">
+            </div>
+
+            <!-- CONTAINER DINÂMICO AGRUPADO POR FUNCIONÁRIO -->
+            <div id="admin-employee-container" style="margin-top: 15px;">
+                <!-- Preenchido via JavaScript -->
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <button class="btn-inline btn-danger" onclick="limparRegistros()" style="font-size: 13px;">⚠️ Zerar Sistema</button>
+                <button class="btn-inline" style="background-color: #64748b;" onclick="voltarAoInicio()">Sair do Painel Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN ADMIN PROFISSIONAL -->
+    <div id="modal-login-admin" class="modal-overlay hidden">
+        <div class="modal-content" style="text-align: center; max-width: 400px;">
+            <div class="logo-container" style="margin-bottom: 15px;">
+                <svg viewBox="0 0 500 150" width="180" height="55" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 40,48 Q 250,10 480,16" fill="none" stroke="#8C9B25" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M 28,58 Q 250,20 465,36" fill="none" stroke="#7E8B26" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M 15,68 Q 250,32 445,56" fill="none" stroke="#63721A" stroke-width="7.5" stroke-linecap="round"/>
+                    <text x="250" y="114" text-anchor="middle" font-family="'Arial Black', 'Impact', sans-serif" font-weight="900" font-size="76" fill="#00382B" letter-spacing="-3">engesp</text>
+                    <text x="250" y="142" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-weight="600" font-size="18" fill="#7E8B26" letter-spacing="5">Engenharia São Patrício</text>
+                </svg>
+            </div>
+            <h3 style="color: var(--primary); margin-bottom: 5px; font-size: 18px;">Acesso Restrito</h3>
+            <p style="font-size: 13px; color: #64748b; margin-top: 0; margin-bottom: 20px;">Painel Gerencial e Recursos Humanos</p>
+            
+            <div style="text-align: left;">
+                <label for="admin-pass">Senha de Acesso:</label>
+                <input type="password" id="admin-pass" placeholder="Digite sua senha..." onkeydown="if(event.key === 'Enter') validarSenhaAdmin()">
+            </div>
+            
+            <div id="admin-login-error" class="hidden" style="color: var(--danger); font-size: 12px; font-weight: bold; margin-bottom: 12px;">
+                ❌ Senha incorreta. Tente novamente.
+            </div>
+
+            <button onclick="validarSenhaAdmin()" style="background-color: var(--primary); padding: 14px; font-size: 15px; margin-bottom: 8px;">🔓 Entrar no Painel</button>
+            <button class="btn-inline btn-secondary" style="width: 100%; border: none; color: #64748b; font-size: 13px;" onclick="fecharModal('modal-login-admin')">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL COMPROVANTE -->
+    <div id="modal-comprovante" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="recibo">
+                <h3>ENGESP - Ponto Validado</h3>
+                <p>Biometria Confirmada</p>
+                <img id="recibo-foto" class="foto-comprovante" src="" alt="Foto">
+                <div class="destaque" id="recibo-hora">00:00</div>
+                <p id="recibo-data">00/00/0000</p>
+                <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 15px 0;">
+                <p><strong>Colaborador:</strong> <span id="recibo-nome"></span></p>
+                <p><strong>Movimento:</strong> <span id="recibo-tipo"></span></p>
+                <p style="font-size: 10px; color: #94a3b8; margin-top: 15px;">Autenticação: <span id="recibo-hash"></span></p>
+            </div>
+            <button onclick="fecharComprovante()" style="background-color: var(--success);">OK, Concluir</button>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR REGISTRO (ADMIN) -->
+    <div id="modal-editar-registro" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>✏️ Editar Registro</h3>
+            
+            <label for="edit-reg-func">Colaborador:</label>
+            <select id="edit-reg-func"></select>
+
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="edit-reg-data">Data:</label>
+                    <input type="date" id="edit-reg-data">
+                </div>
+                <div style="flex: 1;">
+                    <label for="edit-reg-hora">Hora Exata:</label>
+                    <input type="time" id="edit-reg-hora">
+                </div>
+            </div>
+
+            <label for="edit-reg-obra">Obra:</label>
+            <select id="edit-reg-obra"></select>
+
+            <label for="edit-reg-tipo">Movimento:</label>
+            <select id="edit-reg-tipo">
+                <option value="Entrada">Entrada</option>
+                <option value="Saída Almoço">Saída Almoço</option>
+                <option value="Retorno Almoço">Retorno Almoço</option>
+                <option value="Saída">Saída Expediente</option>
+                <option value="Hora Extra 50%">Hora Extra 50%</option>
+                <option value="Hora Extra 100%">Hora Extra 100%</option>
+            </select>
+
+            <button onclick="salvarEdicaoRegistro()" style="background-color: var(--primary); margin-top: 10px;">Salvar Alterações</button>
+            <button class="btn-inline" style="background-color: transparent; color: #64748b; width: 100%; margin-top: 10px;" onclick="fecharModal('modal-editar-registro')">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL BATIDA MANUAL / HORA EXTRA (ADMIN) -->
+    <div id="modal-batida-manual" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>⏱️ Lançamento Manual / Hora Extra</h3>
+            
+            <label for="manual-reg-func">Colaborador:</label>
+            <select id="manual-reg-func"></select>
+
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="manual-reg-data">Data:</label>
+                    <input type="date" id="manual-reg-data">
+                </div>
+                <div style="flex: 1;">
+                    <label for="manual-reg-hora">Hora:</label>
+                    <input type="time" id="manual-reg-hora">
+                </div>
+            </div>
+
+            <label for="manual-reg-obra">Obra:</label>
+            <select id="manual-reg-obra"></select>
+
+            <label for="manual-reg-tipo">Tipo de Apontamento:</label>
+            <select id="manual-reg-tipo" onchange="alternarCamposHoraExtra()">
+                <option value="Entrada">Entrada Padrão</option>
+                <option value="Saída Almoço">Saída Almoço (12:00)</option>
+                <option value="Retorno Almoço">Retorno Almoço (13:00)</option>
+                <option value="Saída">Saída Expediente (17:00 / Horário Real)</option>
+                <option value="Hora Extra 50%">Hora Extra (Adicional 50%)</option>
+                <option value="Hora Extra 100%">Hora Extra (Adicional 100%)</option>
+            </select>
+
+            <div id="bloco-qtd-he" class="hidden" style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
+                <label for="manual-reg-qtd-he" style="color: #92400e;">Quantidade de Horas Extras:</label>
+                <select id="manual-reg-qtd-he">
+                    <option value="1 hora">1 Hora</option>
+                    <option value="1.5 horas">1 hora e meia (1h30)</option>
+                    <option value="2 horas" selected>2 Horas</option>
+                    <option value="3 horas">3 Horas</option>
+                    <option value="4 horas">4 Horas</option>
+                </select>
+            </div>
+
+            <button onclick="salvarBatidaManual()" style="background-color: var(--primary); margin-top: 10px;">Confirmar Lançamento</button>
+            <button class="btn-inline" style="background-color: transparent; color: #64748b; width: 100%; margin-top: 10px;" onclick="fecharModal('modal-batida-manual')">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR FUNCIONÁRIO (ADMIN) -->
+    <div id="modal-editar-funcionario" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>✏️ Editar Cadastro</h3>
+            
+            <label for="input-edit-func-nome">Nome e Matrícula:</label>
+            <input type="text" id="input-edit-func-nome" placeholder="Ex: NOME - Matrícula: 1234">
+
+            <button onclick="salvarEdicaoFuncionario()" style="background-color: var(--primary); margin-top: 10px;">Salvar Alterações</button>
+            <button class="btn-inline" style="background-color: transparent; color: #64748b; width: 100%; margin-top: 10px;" onclick="fecharModal('modal-editar-funcionario')">Cancelar</button>
+        </div>
+    </div>
+
+    <canvas id="canvas-foto" hidden></canvas>
+    
+    <div class="footer">
+        Inteligência Logística & Reconhecimento Facial - ENGESP
+        <span class="creator">Desenvolvido por Koda Studio Artes</span>
+        <span class="copy">© 2026 Koda Studio Artes. Todos os direitos reservados.</span>
+    </div>
+
+    <script>
+        // ====== DADOS LOCAIS ======
+        let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [
+            "ADEILTON LIMA DE ALMEIDA - Matrícula: 4849", 
+            "CLAUDINEI ALVES CALISTO - Matrícula: 4823", 
+            "VICTOR HUGO DE JESUS GUIMARAES - Matrícula: 4515"
+        ];
+        let obras = JSON.parse(localStorage.getItem('obras')) || [
+            "Raul Soares MG", "Obra Central", "Condomínio Vale Verde"
+        ];
+        
+        let registros = JSON.parse(localStorage.getItem('registros')) || [];
+        let biometriaFacial = JSON.parse(localStorage.getItem('biometriaFacial')) || {}; 
+        
+        let streamDeVideo = null;
+        let iaCarregada = false;
+        let modoCamera = 'ponto'; 
+        let ultimoVetorCapturado = null;
+        let ultimaFotoBase64 = null;
+        let latitudeAtual = "Sem GPS";
+        let longitudeAtual = "Sem GPS";
+
+        let registroEmEdicaoId = null;
+        let funcionarioEmEdicaoNome = null;
+
+        // ====== INICIALIZAÇÃO ======
+        setInterval(() => {
+            const agora = new Date();
+            document.getElementById('relogio-digital').innerText = agora.toLocaleTimeString('pt-BR');
+            document.getElementById('data-atual').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }, 1000);
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            carregarListas();
+            try {
+                const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+                await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+                
+                iaCarregada = true;
+                const statusLoad = document.getElementById('status-carregamento-ia');
+                statusLoad.innerText = "Sistema Biométrico Pronto ✅";
+                statusLoad.className = "status-box status-reconhecido";
+            } catch(e) {
+                document.getElementById('status-carregamento-ia').innerText = "Erro ao carregar modelos de IA. Verifique sua conexão.";
+                console.error(e);
+            }
+        });
+
+        function carregarListas() {
+            document.getElementById('select-colaborador').innerHTML = funcionarios.sort().map(f => `<option value="${f}">${f}</option>`).join('');
+            document.getElementById('select-obra-inicial').innerHTML = obras.sort().map(o => `<option value="${o}">${o}</option>`).join('');
+        }
+
+        // ====== NAVEGAÇÃO ======
+        function mostrarTela(idTela) {
+            document.querySelectorAll('#tela-inicial, #tela-camera, #tela-historico-func, #tela-admin').forEach(el => el.classList.add('hidden'));
+            document.getElementById(idTela).classList.remove('hidden');
+        }
+
+        function voltarAoInicio() {
+            desligarCamera();
+            mostrarTela('tela-inicial');
+        }
+
+        // ====== LOGIN ADMIN ESTILIZADO ======
+        function mostrarTelaLoginAdmin() {
+            document.getElementById('admin-pass').value = '';
+            document.getElementById('admin-login-error').classList.add('hidden');
+            document.getElementById('modal-login-admin').classList.remove('hidden');
+            setTimeout(() => document.getElementById('admin-pass').focus(), 100);
+        }
+
+        function validarSenhaAdmin() {
+            const senha = document.getElementById('admin-pass').value;
+            if (senha === "Ko789456") {
+                fecharModal('modal-login-admin');
+                atualizarDashboardAdmin(); 
+                renderizarListaFuncionariosAdmin(); 
+                renderizarListaObrasAdmin();
+                mostrarTela('tela-admin');
+            } else {
+                document.getElementById('admin-login-error').classList.remove('hidden');
+                document.getElementById('admin-pass').value = '';
+                document.getElementById('admin-pass').focus();
+            }
+        }
+
+        function fecharModal(idModal) {
+            document.getElementById(idModal).classList.add('hidden');
+        }
+
+        // ====== FLUXO DE CÂMERA E BIOMETRIA ======
+        async function iniciarFluxoBiometrico(modo) {
+            if (!iaCarregada) {
+                alert("Aguarde a Inteligência Artificial ser carregada.");
+                return;
+            }
+            modoCamera = modo;
+            document.getElementById('secao-vincular').classList.add('hidden');
+            
+            if (modo === 'ponto') {
+                document.getElementById('titulo-camera').innerText = "Bater Ponto Biométrico";
+                document.getElementById('acoes-ponto').classList.remove('hidden');
+            } else {
+                document.getElementById('titulo-camera').innerText = "Autenticação para Histórico";
+                document.getElementById('acoes-ponto').classList.add('hidden');
+            }
+
+            mostrarTela('tela-camera');
+            await iniciarCamera();
+            capturarLocalizacao();
+
+            if (modo === 'historico') {
+                document.getElementById('status-ia').innerText = "Identificando seu rosto...";
+                setTimeout(() => processarBiometriaHistorico(), 1200);
+            }
+        }
+
+        async function iniciarCamera() {
+            try {
+                streamDeVideo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                document.getElementById('video-feed').srcObject = streamDeVideo;
+                document.getElementById('status-ia').className = "status-box";
+                document.getElementById('status-ia').innerText = "Posicione seu rosto em frente à câmera.";
+            } catch(err) {
+                alert("Erro ao acessar a câmera. Verifique as permissões do dispositivo.");
+                voltarAoInicio();
+            }
+        }
+
+        function desligarCamera() {
+            if (streamDeVideo) {
+                streamDeVideo.getTracks().forEach(track => track.stop());
+                streamDeVideo = null;
+            }
+        }
+
+        function cancelarFluxoCamera() {
+            desligarCamera();
+            voltarAoInicio();
+        }
+
+        function capturarLocalizacao() {
+            if (navigator.geolocation && navigator.onLine) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => { latitudeAtual = pos.coords.latitude; longitudeAtual = pos.coords.longitude; },
+                    (err) => { latitudeAtual = "Sem GPS"; longitudeAtual = "Sem GPS"; },
+                    { enableHighAccuracy: true, timeout: 5000 }
+                );
+            }
+        }
+
+        // ====== PROCESSAMENTO DE PONTO ======
+        async function processarBiometriaPonto() {
+            const statusBox = document.getElementById('status-ia');
+            const video = document.getElementById('video-feed');
+            
+            statusBox.className = "status-box";
+            statusBox.innerText = "Analisando feições biométricas...";
+
+            const canvas = document.getElementById('canvas-foto');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ultimaFotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+            const deteccao = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+
+            if (!deteccao) {
+                statusBox.innerText = "❌ Nenhum rosto encontrado. Posicione-se bem com boa iluminação.";
+                statusBox.className = "status-box status-erro";
+                return;
+            }
+
+            ultimoVetorCapturado = Array.from(deteccao.descriptor);
+            const colaboradorReconhecido = buscarDonoDoRosto(deteccao.descriptor);
+
+            if (colaboradorReconhecido) {
+                statusBox.className = "status-box status-reconhecido";
+                statusBox.innerText = `Reconhecido: ${colaboradorReconhecido.split('-')[0]} ✅`;
+                setTimeout(() => registrarPontoDefinitivo(colaboradorReconhecido), 800);
+            } else {
+                desligarCamera();
+                document.getElementById('acoes-ponto').classList.add('hidden');
+                document.getElementById('secao-vincular').classList.remove('hidden');
+            }
+        }
+
+        // ====== PROCESSAMENTO DE HISTÓRICO ======
+        async function processarBiometriaHistorico() {
+            const statusBox = document.getElementById('status-ia');
+            const video = document.getElementById('video-feed');
+
+            if (!video || !streamDeVideo) return;
+
+            const deteccao = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+
+            if (!deteccao) {
+                statusBox.innerText = "❌ Rosto não identificado. Ajuste a posição na câmera.";
+                statusBox.className = "status-box status-erro";
+                setTimeout(() => processarBiometriaHistorico(), 1500);
+                return;
+            }
+
+            const colaboradorReconhecido = buscarDonoDoRosto(deteccao.descriptor);
+
+            if (colaboradorReconhecido) {
+                statusBox.className = "status-box status-reconhecido";
+                statusBox.innerText = `Identificado: ${colaboradorReconhecido.split('-')[0]} ✅`;
+                setTimeout(() => {
+                    desligarCamera();
+                    exibirHistoricoDoFuncionario(colaboradorReconhecido);
+                }, 800);
+            } else {
+                statusBox.className = "status-box status-erro";
+                statusBox.innerText = "❌ Rosto não cadastrado. Registre seu ponto biométrico primeiro.";
+            }
+        }
+
+        function buscarDonoDoRosto(vetorAtual) {
+            let melhorNome = null;
+            let menorDistancia = 0.55; 
+
+            for (let nome in biometriaFacial) {
+                const vetorSalvo = new Float32Array(biometriaFacial[nome]);
+                const distancia = faceapi.euclideanDistance(vetorAtual, vetorSalvo);
+                
+                if (distancia < menorDistancia) {
+                    menorDistancia = distancia;
+                    melhorNome = nome;
+                }
+            }
+            return melhorNome;
+        }
+
+        function vincularEFinalizar() {
+            const nomeSelecionado = document.getElementById('select-colaborador').value;
+            biometriaFacial[nomeSelecionado] = ultimoVetorCapturado;
+            localStorage.setItem('biometriaFacial', JSON.stringify(biometriaFacial));
+            registrarPontoDefinitivo(nomeSelecionado);
+        }
+
+        function registrarPontoDefinitivo(nome) {
+            desligarCamera();
+            const agora = new Date();
+            const obra = document.getElementById('select-obra-inicial').value;
+            const tipo = document.getElementById('tipo-batida-inicial').value;
+
+            const registro = {
+                id: Date.now(),
+                data: agora.toLocaleDateString('pt-BR'), 
+                hora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), 
+                nome: nome, // Corrigido para manter a formatação original do dropdown
+                obra: obra,
+                tipo: tipo, 
+                linkMap: (latitudeAtual !== "Sem GPS") ? `https://www.google.com/maps?q=${latitudeAtual},${longitudeAtual}` : "#",
+                hash: Math.random().toString(36).substring(2, 10).toUpperCase(),
+                foto: ultimaFotoBase64
+            };
+
+            registros.push(registro);
+            localStorage.setItem('registros', JSON.stringify(registros));
+
+            mostrarComprovante(registro);
+        }
+
+        function mostrarComprovante(reg) {
+            document.getElementById('recibo-hora').innerText = reg.hora;
+            document.getElementById('recibo-data').innerText = reg.data;
+            document.getElementById('recibo-nome').innerText = reg.nome.split('-')[0];
+            document.getElementById('recibo-tipo').innerText = reg.tipo;
+            document.getElementById('recibo-hash').innerText = reg.hash;
+            document.getElementById('recibo-foto').src = reg.foto || '';
+            
+            mostrarTela('tela-inicial');
+            document.getElementById('modal-comprovante').classList.remove('hidden');
+        }
+
+        function fecharComprovante() {
+            document.getElementById('modal-comprovante').classList.add('hidden');
+            voltarAoInicio();
+        }
+
+        // ====== TELA DE HISTÓRICO INDIVIDUAL (LINHA DIRETA POR DATA) ======
+        function exibirHistoricoDoFuncionario(nomeFuncionario) {
+            document.getElementById('historico-nome-exibido').innerText = nomeFuncionario.split('-')[0].trim();
+            renderizarTabelaHistoricoFunc(nomeFuncionario);
+            mostrarTela('tela-historico-func');
+        }
+
+        function renderizarTabelaHistoricoFunc(nomeSelecionado) {
+            const tbody = document.querySelector('#tabela-historico-func tbody');
+            tbody.innerHTML = '';
+
+            const filtrados = registros.filter(r => 
+                r.nome.trim().toUpperCase() === nomeSelecionado.trim().toUpperCase()
+            );
+
+            if (filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 20px;">Nenhum ponto registrado até o momento.</td></tr>';
+                return;
+            }
+
+            const agrupadosPorData = {};
+
+            filtrados.forEach(r => {
+                if (!agrupadosPorData[r.data]) {
+                    agrupadosPorData[r.data] = {
+                        data: r.data,
+                        entrada: '--:--',
+                        saidaAlmoco: '--:--',
+                        retornoAlmoco: '--:--',
+                        saida: '--:--',
+                        obra: r.obra || '-'
+                    };
+                }
+
+                const t = r.tipo.trim();
+                if (t === 'Entrada') {
+                    agrupadosPorData[r.data].entrada = r.hora;
+                } else if (t === 'Saída Almoço') {
+                    agrupadosPorData[r.data].saidaAlmoco = r.hora;
+                } else if (t === 'Retorno Almoço') {
+                    agrupadosPorData[r.data].retornoAlmoco = r.hora;
+                } else if (t === 'Saída') {
+                    agrupadosPorData[r.data].saida = r.hora;
+                } else if (t.includes('Hora Extra')) {
+                    agrupadosPorData[r.data].saida += ` (${t})`;
+                }
+
+                if (r.obra) agrupadosPorData[r.data].obra = r.obra;
+            });
+
+            const listaDatas = Object.values(agrupadosPorData).sort((a, b) => {
+                const [dA, mA, yA] = a.data.split('/');
+                const [dB, mB, yB] = b.data.split('/');
+                return new Date(yB, mB - 1, dB) - new Date(yA, mA - 1, dA);
+            });
+
+            listaDatas.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 800; font-size: 12px; color: var(--primary);">${item.data}</td>
+                    <td style="color: #10b981; font-weight: 800;">${item.entrada}</td>
+                    <td style="color: #f59e0b; font-weight: 800;">${item.saidaAlmoco}</td>
+                    <td style="color: #3b82f6; font-weight: 800;">${item.retornoAlmoco}</td>
+                    <td style="color: #ef4444; font-weight: 800;">${item.saida}</td>
+                    <td style="font-size: 11px; color: #64748b;">${item.obra}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ====== GESTÃO OBRAS (ADMIN) ======
+        function renderizarListaObrasAdmin() {
+            const tbody = document.querySelector('#tabela-obras tbody');
+            tbody.innerHTML = '';
+            [...obras].sort().forEach(o => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td style="padding: 8px 15px; font-weight: 600; font-size:12px; text-align: left;">${o}</td>
+                                <td style="padding: 8px 15px; text-align: right; width: 100px; white-space: nowrap;">
+                                    <button class="btn-inline btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="removerObra('${o}')">Excluir</button>
+                                </td>`;
+                tbody.appendChild(tr);
+            });
+            carregarListas(); 
+        }
+
+        function adicionarObra() {
+            const nome = document.getElementById('input-nova-obra').value.trim();
+            if (nome && !obras.includes(nome)) {
+                obras.push(nome);
+                localStorage.setItem('obras', JSON.stringify(obras));
+                document.getElementById('input-nova-obra').value = '';
+                renderizarListaObrasAdmin();
+            }
+        }
+
+        function removerObra(nomeStr) {
+            if(confirm(`Excluir a obra "${nomeStr}"?`)) {
+                obras = obras.filter(o => o !== nomeStr);
+                localStorage.setItem('obras', JSON.stringify(obras));
+                renderizarListaObrasAdmin();
+            }
+        }
+
+        function importarObras() {
+            const texto = prompt("Cole a lista de OBRAS separadas por vírgula ou por linha:");
+            if(texto) {
+                const novas = texto.split(/[\n,]/).map(o => o.trim()).filter(o => o);
+                let count = 0;
+                novas.forEach(n => {
+                    if(!obras.includes(n)) { obras.push(n); count++; }
+                });
+                localStorage.setItem('obras', JSON.stringify(obras));
+                renderizarListaObrasAdmin();
+                alert(`${count} obra(s) importada(s) com sucesso!`);
+            }
+        }
+
+        // ====== GESTÃO COLABORADORES (ADMIN) ======
+        function renderizarListaFuncionariosAdmin() {
+            const tbody = document.querySelector('#tabela-colaboradores tbody');
+            tbody.innerHTML = '';
+            [...funcionarios].sort().forEach(f => {
+                const temBiometria = biometriaFacial[f] ? '<span style="color:var(--success); font-size:10px;">(Rosto Cadastrado)</span>' : '';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td style="padding: 8px 15px; font-weight: 600; font-size:12px; text-align: left;">${f} <br>${temBiometria}</td>
+                                <td style="padding: 8px 15px; text-align: right; width: 130px; white-space: nowrap;">
+                                    <button class="btn-inline btn-edit" style="padding: 4px 8px; font-size: 11px; margin-right: 5px;" onclick="editarFuncionario('${f}')">Editar</button>
+                                    <button class="btn-inline btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="removerFuncionario('${f}')">Excluir</button>
+                                </td>`;
+                tbody.appendChild(tr);
+            });
+            carregarListas(); 
+        }
+
+        function adicionarFuncionario() {
+            const nome = document.getElementById('input-novo-func').value.trim().toUpperCase(); 
+            if (nome && !funcionarios.includes(nome)) {
+                funcionarios.push(nome);
+                localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+                document.getElementById('input-novo-func').value = '';
+                renderizarListaFuncionariosAdmin();
+            }
+        }
+
+        function importarFuncionarios() {
+            const texto = prompt("Cole a lista de FUNCIONÁRIOS separada por vírgula ou por linha (Ex: NOME - Matrícula: 123):");
+            if(texto) {
+                const novos = texto.split(/[\n,]/).map(f => f.trim().toUpperCase()).filter(f => f);
+                let count = 0;
+                novos.forEach(n => {
+                    if(!funcionarios.includes(n)) { funcionarios.push(n); count++; }
+                });
+                localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+                renderizarListaFuncionariosAdmin();
+                alert(`${count} colaborador(es) importado(s) com sucesso!`);
+            }
+        }
+
+        function editarFuncionario(nomeAntigo) {
+            funcionarioEmEdicaoNome = nomeAntigo;
+            document.getElementById('input-edit-func-nome').value = nomeAntigo;
+            document.getElementById('modal-editar-funcionario').classList.remove('hidden');
+        }
+
+        function salvarEdicaoFuncionario() {
+            const novoNome = document.getElementById('input-edit-func-nome').value.trim().toUpperCase();
+            if(!novoNome) return alert("Preencha o nome do colaborador.");
+
+            const index = funcionarios.indexOf(funcionarioEmEdicaoNome);
+            if(index !== -1) {
+                funcionarios[index] = novoNome;
+                localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+
+                if(biometriaFacial[funcionarioEmEdicaoNome]) {
+                    biometriaFacial[novoNome] = biometriaFacial[funcionarioEmEdicaoNome];
+                    delete biometriaFacial[funcionarioEmEdicaoNome];
+                    localStorage.setItem('biometriaFacial', JSON.stringify(biometriaFacial));
+                }
+
+                registros.forEach(r => { if(r.nome === funcionarioEmEdicaoNome) r.nome = novoNome; });
+                localStorage.setItem('registros', JSON.stringify(registros));
+            }
+
+            fecharModal('modal-editar-funcionario');
+            renderizarListaFuncionariosAdmin();
+            atualizarDashboardAdmin();
+        }
+
+        function removerFuncionario(nomeStr) {
+            if(confirm("Remover este colaborador do cadastro?")) {
+                funcionarios = funcionarios.filter(f => f !== nomeStr);
+                localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+                if(biometriaFacial[nomeStr]) {
+                    delete biometriaFacial[nomeStr];
+                    localStorage.setItem('biometriaFacial', JSON.stringify(biometriaFacial));
+                }
+                renderizarListaFuncionariosAdmin();
+            }
+        }
+
+        // ====== PAINEL ADMIN AGRUPADO POR FUNCIONÁRIO ======
+        function atualizarDashboardAdmin() {
+            const hojeStr = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('dash-hoje').innerText = registros.filter(r => r.data === hojeStr).length;
+            document.getElementById('dash-total').innerText = registros.length;
+            renderizarTabelaAdmin();
+        }
+
+        function toggleHistory(id) {
+            const content = document.getElementById(id);
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+            } else {
+                content.classList.add('active');
+            }
+        }
+
+        function renderizarTabelaAdmin() {
+            const container = document.getElementById('admin-employee-container');
+            container.innerHTML = '';
+            
+            const termoNome = document.getElementById('filtro-nome').value.toLowerCase();
+            const termoDataOriginal = document.getElementById('filtro-data').value;
+            let termoData = termoDataOriginal ? termoDataOriginal.split('-').reverse().join('/') : "";
+
+            // Filtra registros
+            const filtrados = registros.slice().reverse().filter(r => 
+                r.nome.toLowerCase().includes(termoNome) && (termoData === "" || r.data === termoData)
+            );
+
+            if (filtrados.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px; background: #f8fafc; border-radius: 8px;">Nenhum apontamento encontrado.</div>';
+                return;
+            }
+
+            // Agrupar por Funcionário (CORREÇÃO DE MAIÚSCULAS/MINÚSCULAS AQUI)
+            const porFuncionario = {};
+            filtrados.forEach(r => {
+                const nomeNormalizado = r.nome.trim().toUpperCase();
+                if (!porFuncionario[nomeNormalizado]) porFuncionario[nomeNormalizado] = [];
+                porFuncionario[nomeNormalizado].push(r);
+            });
+
+            // Criar elementos HTML para cada funcionário
+            let indexEmp = 0;
+            for (let nomeFunc in porFuncionario) {
+                indexEmp++;
+                const cardId = `emp_card_${indexEmp}`;
+                const listaRegs = porFuncionario[nomeFunc];
+
+                // Agrupar registros do funcionário por Data
+                const porData = {};
+                listaRegs.forEach(r => {
+                    if (!porData[r.data]) {
+                        porData[r.data] = { entrada: '--:--', saidaAlmoco: '--:--', retornoAlmoco: '--:--', saida: '--:--', obra: r.obra || '-' };
+                    }
+                    const t = r.tipo.trim();
+                    if (t === 'Entrada') porData[r.data].entrada = r.hora;
+                    else if (t === 'Saída Almoço') porData[r.data].saidaAlmoco = r.hora;
+                    else if (t === 'Retorno Almoço') porData[r.data].retornoAlmoco = r.hora;
+                    else if (t === 'Saída') porData[r.data].saida = r.hora;
+                    else if (t.includes('Hora Extra')) porData[r.data].saida += ` (${t})`;
+                });
+
+                let datasHtml = '';
+                for (let dataStr in porData) {
+                    const d = porData[dataStr];
+                    const tagEntrada = d.entrada !== '--:--' ? `<span class="punch-tag">Entrada: ${d.entrada}</span>` : `<span class="punch-tag missing">Entrada: --:--</span>`;
+                    const tagSAlm = d.saidaAlmoco !== '--:--' ? `<span class="punch-tag">S. Almoço: ${d.saidaAlmoco}</span>` : `<span class="punch-tag missing">S. Almoço: --:--</span>`;
+                    const tagRAlm = d.retornoAlmoco !== '--:--' ? `<span class="punch-tag">R. Almoço: ${d.retornoAlmoco}</span>` : `<span class="punch-tag missing">R. Almoço: --:--</span>`;
+                    const tagSaida = d.saida !== '--:--' ? `<span class="punch-tag">Saída: ${d.saida}</span>` : `<span class="punch-tag missing">Saída: --:--</span>`;
+
+                    datasHtml += `
+                        <div class="day-row">
+                            <div>
+                                <strong style="color: var(--primary);">${dataStr}</strong><br>
+                                <span style="font-size: 11px; color: #64748b;">Obra: ${d.obra}</span>
+                            </div>
+                            <div class="punch-tags-group">
+                                ${tagEntrada} ${tagSAlm} ${tagRAlm} ${tagSaida}
+                            </div>
+                            <div>
+                                <button class="btn-inline btn-edit" style="padding: 5px 10px; font-size: 11px;" onclick="editarRegistroPorDataEColab('${nomeFunc}', '${dataStr}')">✏️ Editar Dia</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const empCard = document.createElement('div');
+                empCard.className = 'employee-card';
+                empCard.innerHTML = `
+                    <div class="employee-header" onclick="toggleHistory('${cardId}')">
+                        <div>
+                            <span>${nomeFunc.split('-')[0]}</span>
+                            <span style="font-size: 11px; color: #64748b; font-weight: normal; display: block;">${nomeFunc}</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--primary);">▼ Expandir Histórico (${listaRegs.length} registros)</div>
+                    </div>
+                    <div class="history-content" id="${cardId}">
+                        ${datasHtml}
+                    </div>
+                `;
+                container.appendChild(empCard);
+            }
+        }
+
+        function alternarCamposHoraExtra() {
+            const tipo = document.getElementById('manual-reg-tipo').value;
+            const blocoQtd = document.getElementById('bloco-qtd-he');
+            if(tipo.includes('Hora Extra')) {
+                blocoQtd.classList.remove('hidden');
+            } else {
+                blocoQtd.classList.add('hidden');
+            }
+        }
+
+        function editarRegistroPorDataEColab(nomeFunc, dataStr) {
+            // Acha o primeiro registro daquele dia para abrir no modal de edição
+            // CORREÇÃO: Trata a diferença de maiúsculas para o botão "Editar Dia" funcionar
+            const reg = registros.find(r => r.nome.trim().toUpperCase() === nomeFunc && r.data === dataStr);
+            if(!reg) return;
+            editarRegistro(reg.id);
+        }
+
+        function editarRegistro(id) {
+            const reg = registros.find(r => r.id === id);
+            if(!reg) return;
+            registroEmEdicaoId = id;
+
+            const partesData = reg.data.split('/');
+            const dataISO = `${partesData[2]}-${partesData[1].padStart(2, '0')}-${partesData[0].padStart(2, '0')}`;
+
+            document.getElementById('edit-reg-data').value = dataISO;
+            document.getElementById('edit-reg-hora').value = reg.hora;
+            document.getElementById('edit-reg-tipo').value = reg.tipo;
+
+            const selFunc = document.getElementById('edit-reg-func');
+            selFunc.innerHTML = funcionarios.sort().map(f => `<option value="${f}">${f}</option>`).join('');
+            selFunc.value = reg.nome;
+
+            const selObra = document.getElementById('edit-reg-obra');
+            selObra.innerHTML = obras.sort().map(o => `<option value="${o}">${o}</option>`).join('');
+            if(reg.obra) selObra.value = reg.obra;
+
+            document.getElementById('modal-editar-registro').classList.remove('hidden');
+        }
+
+        function salvarEdicaoRegistro() {
+            const reg = registros.find(r => r.id === registroEmEdicaoId);
+            if(!reg) return;
+
+            const dataInput = document.getElementById('edit-reg-data').value;
+            if(!dataInput) return alert("Selecione uma data.");
+
+            const partes = dataInput.split('-');
+            const dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+            reg.data = dataFormatada;
+            reg.hora = document.getElementById('edit-reg-hora').value;
+            reg.nome = document.getElementById('edit-reg-func').value;
+            reg.obra = document.getElementById('edit-reg-obra').value;
+            reg.tipo = document.getElementById('edit-reg-tipo').value;
+
+            localStorage.setItem('registros', JSON.stringify(registros));
+            fecharModal('modal-editar-registro');
+            atualizarDashboardAdmin();
+        }
+
+        function abrirModalManual() {
+            document.getElementById('manual-reg-func').innerHTML = funcionarios.sort().map(f => `<option value="${f}">${f}</option>`).join('');
+            document.getElementById('manual-reg-obra').innerHTML = obras.sort().map(o => `<option value="${o}">${o}</option>`).join('');
+            document.getElementById('manual-reg-tipo').value = 'Entrada';
+            document.getElementById('bloco-qtd-he').classList.add('hidden');
+
+            const agora = new Date();
+            const ano = agora.getFullYear();
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const dia = String(agora.getDate()).padStart(2, '0');
+            document.getElementById('manual-reg-data').value = `${ano}-${mes}-${dia}`;
+            
+            const hrs = String(agora.getHours()).padStart(2, '0');
+            const mins = String(agora.getMinutes()).padStart(2, '0');
+            document.getElementById('manual-reg-hora').value = `${hrs}:${mins}`;
+
+            document.getElementById('modal-batida-manual').classList.remove('hidden');
+        }
+
+        function salvarBatidaManual() {
+            const func = document.getElementById('manual-reg-func').value;
+            const obra = document.getElementById('manual-reg-obra').value;
+            let tipo = document.getElementById('manual-reg-tipo').value;
+            const dataVal = document.getElementById('manual-reg-data').value;
+            const horaVal = document.getElementById('manual-reg-hora').value;
+
+            if(!dataVal || !horaVal) return alert("Preencha data e hora.");
+
+            if(tipo.includes('Hora Extra')) {
+                const qtdHe = document.getElementById('manual-reg-qtd-he').value;
+                tipo = `${tipo} (${qtdHe})`;
+            }
+
+            const partes = dataVal.split('-');
+            const dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+            const registro = {
+                id: Date.now(),
+                data: dataFormatada,
+                hora: horaVal,
+                nome: func, // Corrigido para manter a formatação original e não criar nomes duplicados
+                obra: obra,
+                tipo: tipo,
+                linkMap: "Lançamento Manual",
+                hash: "MANUAL-" + Math.random().toString(36).substring(2, 7).toUpperCase(),
+                foto: ""
+            };
+
+            registros.push(registro);
+            localStorage.setItem('registros', JSON.stringify(registros));
+            fecharModal('modal-batida-manual');
+            atualizarDashboardAdmin();
+        }
+
+        function limparRegistros() {
+            if(confirm("ATENÇÃO: Deseja apagar todo o histórico e cadastros biométricos do sistema?")) {
+                registros = [];
+                biometriaFacial = {};
+                localStorage.setItem('registros', JSON.stringify(registros));
+                localStorage.setItem('biometriaFacial', JSON.stringify(biometriaFacial));
+                atualizarDashboardAdmin();
+                renderizarListaFuncionariosAdmin();
+            }
+        }
+
+        function exportarCSV() {
+            if (registros.length === 0) return alert("Nenhum registro para exportar.");
+            let csv = "\uFEFFData;Hora;Nome;Matrícula;Obra;Tipo/Adicional;Link GPS\n";
+            registros.forEach(r => {
+                const parts = r.nome.split('-');
+                const nomePuro = parts[0] ? parts[0].trim() : r.nome;
+                const matPura = parts[1] ? parts[1].replace('Matrícula:', '').trim() : '';
+                csv += `${r.data};${r.hora};${nomePuro};${matPura};${r.obra};${r.tipo};${r.linkMap}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Relatorio_Ponto_ENGESP.csv`;
+            link.click();
+        }
+    </script>
+</body>
+</html>
